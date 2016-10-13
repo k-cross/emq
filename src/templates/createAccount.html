@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>EMQ Create Account</title>
+
+    <link href="{{ url_for('static', filename='bootstrap.css') }}" rel="stylesheet">
+    
+       <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+
+    
+    
+    
+    
+  </head>
+
+  <body>
+
+    <nav>
+	<ul>
+    	<div id="logo">EMQ</div>
+    	<li>Home</li>
+      <li>Products</li>
+      <li>Abous Us</li>
+      <li>Contact</li>
+        
+      <div id="login">Log in</div>
+
+    </ul>
+  
+	    <div class="container">
+	    	
+	    	<div id="newProfile" class="col-sm-6 col-sm-offset-3">
+	    		<h1>Create Account</h1>
+	    		<!-- new profile -->
+    			<form name="newprofile1">
+    				<!-- NAME -->
+    				<div class="form-group">
+    					<input type="text" name="userfname" class="form-control" placeholder="First Name">
+    					<input type="text" name="userlname" class="form-control" placeholder="Last Name">
+    				</div>
+            
+    				<!-- EMAIL -->
+    				<div class="form-group">
+    					<input type="email" name="userEmail" class="form-control" placeholder="Email Address">
+    				</div>
+    				<!-- PHONE NUMBER -->
+    				<div class="form-group">
+    					<input type="number" name="userPhone" class="form-control" placeholder="Phone Number">
+    				</div>
+            
+    				<button id="sendDataButton" type="button" class="btn btn-default">Continue</button>
+    			</form>
+
+	    	</div><!-- /.col-sm-6 -->
+	    	
+	    	<div id="updatedProfile" class="col-sm-6 col-sm-offset-3">
+          <div class="header"><h2 id='userName'></h2></div>
+	    		  
+	    	
+	    		<div>
+	    			
+	    			<h3 id="userGender"></h3>
+	    			<h3 id="userEmail"></h3>
+	    			<h3 id="userPhone"></h3>
+	    			<h3 id="userColor"></h3>
+	    			<h3 id="userBirthplace"></h3>
+
+	    			
+	    		</div><!-- /#updatedProfile -->
+
+	    	</div><!-- /.col-sm-6 -->
+
+	    </div><!-- /.container -->
+    
+    
+    
+    
+  </body>
+</html>
