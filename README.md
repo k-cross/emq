@@ -5,3 +5,9 @@
 * Check to make sure you have Selenium and Flask (>=v0.11)
     * You can try the command in your native cli: "pip install flask"
     * You can try the command in your native cli: "pip install selenium"
+### Using Virtual Environment
+* Create Environment
+    * virtualenv venv
+* Use Environment
+    * source venv/bin/activate ========> Works on *nix/mac
+    * venv\Scripts\activate =========> Works on windows

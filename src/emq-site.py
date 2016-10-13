@@ -12,21 +12,21 @@ def home():
 	try:
 		return render_template('home.html')
 	except Exception as e:
-		print e
+		print(e)
 
 @app.route('/createAccount')
 def createAccount():
 	try:
 		return render_template('createAccount.html')
 	except Exception as e:
-		print e
+		print(e)
 
 @app.route('/login')
 def login():
 	try:
 		return render_template('login.html')
 	except Exception as e:
-		print e
+		print(e)
 
 
 @app.route('/trackDelivery')
@@ -38,7 +38,7 @@ def trackDelivery():
 		return render_template('map.html', key=key, startLocation=startLocation, endLocation=endLocation)
 
 	except Exception as e:
-		print e
+		print(e)
 
 
  
