@@ -1,0 +1,18 @@
+{% extends "bootstrap/base.html" %}
+
+{% block navbar %}
+  <div class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle"
+         data-toggle="collapse" data-target=".navbar-collapse">
+        </button>
+        <a class="navbar-brand" href="/">Home</a>
+        <a class="navbar-brand" href="/products">Products</a>
+        <a class="navbar-brand" href="/about">About Us</a>
+        <a class="navbar-brand" href="/contact">Contact</a>
+        <a class="navbar-brand" href="/">Log In</a> <!-- Need to change this for dynamic update upon changes -->
+      </div>
+    </div>
+  </div>
+{% endblock %}
