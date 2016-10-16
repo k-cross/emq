@@ -6,13 +6,39 @@
       <div class="navbar-header">
         <button type="button" class="navbar-toggle"
          data-toggle="collapse" data-target=".navbar-collapse">
+
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar">Home</span>
+            <span class="icon-bar">Products</span>
+            <span class="icon-bar">Abous Us</span>
+            <span class="icon-bar">Contact</span>
+            <span class="icon-bar">Login</span>
+
         </button>
         <a class="navbar-brand" href="/">Home</a>
-        <a class="navbar-brand" href="/products">Products</a>
-        <a class="navbar-brand" href="/about">About Us</a>
-        <a class="navbar-brand" href="/contact">Contact</a>
+        <a class="navbar-brand" href="/">Products</a>
+        <a class="navbar-brand" href="/">About Us</a>
+        <a class="navbar-brand" href="/">Contact</a>
         <a class="navbar-brand" href="/">Log In</a> <!-- Need to change this for dynamic update upon changes -->
       </div>
     </div>
   </div>
+{% endblock %}
+
+{% block metas %}
+charset='utf-8'
+{% endblock %}
+
+{% block html-attr %}
+lang='en'
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Super is for flask-bootstrap -->
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Super is for flask-bootstrap -->
 {% endblock %}
