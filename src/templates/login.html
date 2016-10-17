@@ -1,25 +1,15 @@
-<!DOCTYPE html>
-<html >
-  <head>
-    <meta charset="UTF-8">
-    <title>EMQ</title>
-    
-  <link href="{{ url_for('static', filename='bootstrap.css') }}" rel="stylesheet">
-    
-       <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
-    
-    
-    
-  </head>
+{% extends "base.html" %}
 
+{% block title %}EMQ - Sign In{% endblock %}
+<html >
   <body>
 
-    <html>
+  <html>
 
 <nav>
-	<ul>
-    	<div id="logo">EMQ</div>
-    	<li>Home</li>
+  <ul>
+      <div id="logo">EMQ</div>
+      <li>Home</li>
       <li>Products</li>
       <li>Abous Us</li>
       <li>Contact</li>
@@ -45,10 +35,5 @@
 </form>
 </footer>
 </html>
-    <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-
-    
-    
-    
-  </body>
+</body>
 </html>

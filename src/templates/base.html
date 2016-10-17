@@ -1,0 +1,43 @@
+{% extends "bootstrap/base.html" %}
+
+{% block navbar %}
+  <div class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle"
+         data-toggle="collapse" data-target=".navbar-collapse">
+        </button>
+        <a class="navbar-brand" href="/">Home</a>
+        <a class="navbar-brand" href="/products">Products</a>
+        <a class="navbar-brand" href="/about">About Us</a>
+        <a class="navbar-brand" href="/contact">Contact</a>
+        <a class="navbar-brand" href="/login">Log In</a> <!-- Need to change this for dynamic update upon changes -->
+        <a class="navbar-brand" href="/cart">Shopping Cart</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% block page_content %}{% endblock %}
+</div>
+{% endblock %}
+
+{% block metas %}
+<meta charset="utf-8">
+{% endblock %}
+
+{% block html_attr %}
+<html lang="en">
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Super is for flask-bootstrap -->
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<!-- Super is for flask-bootstrap -->
+{% endblock %}
