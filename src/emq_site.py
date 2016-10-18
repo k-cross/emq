@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField
 from wtforms.validators import Required, NumberRange
 
+# Our written additions
 from shopping_cart import ShoppingCart
 
 app = Flask(__name__)
@@ -38,6 +39,7 @@ def shopping_cart():
 
     if form.validate_on_submit():
         items = form.item_count.data
+        form.item_count.data = 0 # Change to the updated value
     return render_template('shopping_cart.html', form=form, items=items)
 
 @app.route('/trackDelivery')
