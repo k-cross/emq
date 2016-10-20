@@ -13,6 +13,9 @@ def login():
 			user = request.form['username']
 			passw = request.form['password']
 
+			
+			
+			
 			isRegistered = User.query.filter_by(user = username, passw = password).first()
 			if(isRegisered is none)
 				flash('Incorrect login. Please try again')

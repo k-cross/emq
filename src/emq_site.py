@@ -3,12 +3,25 @@ from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField
 from wtforms.validators import Required, NumberRange
+from flaskext.mysql import MySQL
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # Our written additions
 from shopping_cart import ShoppingCart
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'test' # This really should go in a seperate file
+mysql = MySQL()
+app = Flask(__name__)
+
+#change user and password if needed
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
+app.config['MYSQL_DATABASE_DB'] = 'emq'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+mysql.init_app(app)
+
+
 bootstrap = Bootstrap(app)
 
 @app.route('/')
@@ -25,12 +38,74 @@ def createAccount():
     except Exception as e:
         print(e)
 
+@app.route('/addUser',methods = ['POST', 'GET'])
+def addUser():
+   msg = "test"
+   if request.method == 'POST':
+         
+         Username = request.form['username']
+         Password = request.form['userpassword']
+         Fname = request.form['userfname']
+         Lname = request.form['userlname']
+         Email = request.form['userEmail']
+         Street = request.form['street']
+         Zip = int(request.form['zip'])
+         City = request.form['city']
+         State = request.form['state']
+
+         hashed = generate_password_hash(Password)
+         
+         conn = mysql.connect()
+         cursor = conn.cursor()
+         #data = cursor.fetchone()
+         if not cursor is None:
+
+             cursor.execute("INSERT INTO user (username,password,email,fname,lname,street,zip,city,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",(Username,hashed,Email,Fname,Lname,Street,Zip,City,State))
+             conn.commit()
+             msg = "Record successfully added"
+         else: 
+             msg = "error in insert operation"
+      
+    
+         conn.close()
+         return render_template("result.html",msg = msg)
+         
+
 @app.route('/login')
 def login():
     try:
         return render_template('login.html')
     except Exception as e:
         print(e)
+
+@app.route('/checkUser',methods = ['POST', 'GET'])
+def checkUser():
+    Username = request.form['username']
+    Password = request.form['pass']
+    
+    conn = mysql.connect()
+    cursor = conn.cursor()
+         
+    if not cursor is None:
+
+        cursor.execute("Select password from user where username='"+Username+"'")
+            
+        row = cursor.fetchone ()
+        if not row is None:
+            hashed = row[0]
+            print(hashed)
+            #print(generate_password_hash(Password))
+            matches = check_password_hash(hashed, Password)
+
+            if matches:
+                msg = "Login successful"
+            else:
+                msg = "Username or Password is wrong"
+        else:
+            msg = "the user is not in the database"
+    conn.close()
+    return render_template("result.html",msg = msg)
+         
 
 @app.route('/cart', methods=['GET', 'POST'])
 def shopping_cart():
@@ -51,6 +126,19 @@ def trackDelivery():
         return render_template('map.html', key=key, startLocation=startLocation, endLocation=endLocation)
     except Exception as e:
         print(e)
+
+@app.route('/listUser')
+def list():
+    cursor = mysql.connect().cursor()
+    cursor.execute("SELECT * from user")
+    rows = cursor.fetchall(); 
+
+    for row in rows:
+        #rows.append(row)
+        print(row)
+
+    return render_template("list.html",rows = rows)
+                        
 
 @app.errorhandler(404)
 def page_not_found(e):

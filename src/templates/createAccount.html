@@ -1,73 +1,68 @@
-<!DOCTYPE html>
-<html >
-  <head>
-    <meta charset="UTF-8">
-    <title>EMQ Create Account</title>
+{% extends "base.html" %}
+{% block title %}EMQ Create Account{% endblock %}
 
-    <link href="{{ url_for('static', filename='bootstrap.css') }}" rel="stylesheet">
+    {% block styles %}
+		{{ super() }}
+		<link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+	{% endblock %}
     
-       <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
-
-    
-    
-    
-    
-  </head>
-
-  <body>
-
-    <nav>
-	<ul>
-    	<div id="logo">EMQ</div>
-    	<li>Home</li>
-      <li>Products</li>
-      <li>Abous Us</li>
-      <li>Contact</li>
-        
-      <div id="login">Log in</div>
-
-    </ul>
-  
-	    <div class="container">
+   
+{% block content %}
 	    	
 	    	<div id="newProfile" class="col-sm-6 col-sm-offset-3">
 	    		<h1 align = "center">Create Account</h1>
 	    		<!-- new profile -->
-    			<form name="newprofile1">
+    			<form name="newprofile1" action = "{{ url_for('addUser') }}" method = "POST">
     				<!-- NAME -->
-    				<div class="form-group">
-    					<input type="text" name="userfname" class="form-control" placeholder="First Name">
-                        <br>
-    					<input type="text" name="userlname" class="form-control" placeholder="Last Name">
-    				</div>
-                    <br>
-            
-    				<!-- EMAIL -->
-    				<div class="form-group">
-    					<input type="email" name="userEmail" class="form-control" placeholder="Email Address">
-    				</div>
-                    <br>
-    				<!-- PHONE NUMBER -->
-    				<div class="form-group">
-    					<input type="number" name="userPhone" class="form-control" placeholder="Phone Number" max="10">
-    				</div>
-                    <br>
-                    <div class="form-group">
-    					<input type="text" name="userName" class="form-control" placeholder="Username">
-                        <br>
-                        <input type="password" name="password" class="form-control" placeholder="Password">
-    				</div>
-                    <br>
-                    <!--USER TYPE -->
-                    <div>Account Type:
-                        </dib><select>
-                        <option value="Account Type">Manager</option>
-                        <option value="Account Type">Regular</option>
-                    </select></div>
-                    <br>
-                    <br>
-    				<button id="sendDataButton" type="button" class="btn pull-right">Create Account</button>
-                    
+    				 <div class="form-group">
+					  <input type="text" name="username" class="form-control" placeholder="username" required>
+					 </div>
+					 
+					 <!-- PASSWORD -->
+					 <div class="form-group">
+					  <input type="password" name="userpassword" class="form-control" placeholder="PASSWORD" required>
+					 </div>
+					 
+					 <!-- EMAIL -->
+					<div class="form-group">
+					  <input type="email" name="userEmail" class="form-control" placeholder="Email Address" required>
+					</div>
+					
+					 <!-- FIRST LAST NAME -->
+					<div class="form-group">
+					  <input type="text" name="userfname" class="form-control " placeholder="First Name" required>
+					  <input type="text" name="userlname" class="form-control " placeholder="Last Name"required>
+					</div>
+					
+					<div class="form-group">
+					  <input type="text" name="street" class="form-control " placeholder="Street" required>
+					</div>
+					
+					<div class="form-group">
+					  <input type="number" name="zip" min="0" max="99999"class="form-control " placeholder="ZIP" required>
+					</div>
+					
+					<div class="form-group">
+					  <input type="text" name="city" class="form-control " placeholder="City" required>
+					</div>
+					
+					<div class="form-group">
+					  <input type="text" name="state" class="form-control " placeholder="State" required>
+					</div>
+					
+					
+					<br>
+					<!--USER TYPE -->
+					<div>Account Type:
+						</dib><select>
+						<option value="Account Type">Manager</option>
+						<option value="Account Type">Regular</option>
+					</select></div>
+					<br>
+					<br>
+					<!--<button id="sendDataButton" type="button" class="btn pull-right">Create Account</button-->
+					<input type = "submit"  class="button buttonBlue" value = "Create Account" />
+							
     			</form>
 
 	    	</div><!-- /.col-sm-6 -->
@@ -88,11 +83,5 @@
 	    		</div><!-- /#updatedProfile -->
 
 	    	</div><!-- /.col-sm-6 -->
-
-	    </div><!-- /.container -->
-    
-    
-    
-    
-  </body>
-</html>
+       
+{% endblock %}

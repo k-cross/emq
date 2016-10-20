@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}User{% endblock %}
+{% block content %}
+		<table border = 1>
+         <thead>
+			<td>UserId</td>
+			<td>UserName</td>
+			<td>Password</td>
+			<td>Email</td>
+            <td>FirstName</td>
+            <td>LastName</td>
+            <td>Street</td>
+            <td>Zip</td>
+			<td>city</td>
+			<td>state</td>
+         </thead>
+         
+         {% for row in rows %}
+            <tr>
+				{% for d in row %}
+					<td>{{ d }}</td>
+				{% endfor %}
+            </tr>
+         {% endfor %}
+      </table>
+      
+      <a href = "/">Go back to home page</a>
+{% endblock %}

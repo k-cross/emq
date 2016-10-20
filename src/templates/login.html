@@ -1,68 +1,52 @@
-<!DOCTYPE html>
-<html >
-  <head>
-    <meta charset="UTF-8">
-    <title>EMQ</title>
-    
-  <link href="{{ url_for('static', filename='bootstrap.css') }}" rel="stylesheet">
-    
-       <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
-    
-    
-    
-  </head>
+{% extends "base.html" %}
+{% block title %}EMQ Sign in{% endblock %}
 
-  <body>
+    {% block styles %}
+		{{ super() }}
+		<link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+	{% endblock %}
+    
+   
+{% block content %}
 
-    <html>
+<form name="login" action = "{{ url_for('checkUser') }}" method = "POST">
+	<div class="form-group">
+		<label for="username" class="control-label">
+				Username</label>
+		<input type="text" class="form-control" id="username" name="username" placeholder="Username" value="" required="">
+	</div>
 
-<nav>
-	<ul>
-    	<div id="logo">EMQ</div>
-       <li>Home</li>
-      <li>Products</li>
-      <li>Abous Us</li>
-      <li>Contact</li>
-        
-      <div id="login">Log in</div>
+	<div class="form-group">
+		<label for="pass" class="control-label">
+				Password</label>
+		<input type="password" class="form-control" id="pass" name="pass" placeholder="Password" required="">
+	</div>
 
-    </ul>
-</nav>
-
-<headerp>
-  <h1>EMQ Sign in</h1>
-</header>
-<form>
-  <div class="group">
-    <input type="Username" placeholder = "Username"></span>
-  </div>
-  <div class="group">
-    <input type = "password" placeholder = "Password" required ="password required"/></span>
-  </div>
-  <button type="button" onclick = "check(this.confirm)" class="button buttonBlue">Log in
-    <div class="ripples buttonRipples"><span class="ripplesCircle"></span></div>
-  </button>
-      <button id ="createButton" class ="float-left sub-button">Sign up</button>
-      <script type="text/javascript">
-        document.getElementById("createButton").onclick = function () {
-            location.href = "http://127.0.0.1:5000/createAccount";
-        };
-        function check(confirm){
-            if(form.Username.value == form.Password.value){
-                window.open('http://127.0.0.1:5000/home');
-            }
-            else{
-                alert("Incorrect Password or Username");
-            }
-        }
-      </script>
+	<input type = "submit" value = "Log In" class="button buttonBlue"/><br>
+	<!--				
+	<button type="button" onclick = "check(this.confirm)" class="button buttonBlue">Log in
+  
+	<div class="ripples buttonRipples"><span class="ripplesCircle"></span></div>
+	</button>
+    -->
+	<button id ="createButton" class ="float-left sub-button">Sign up</button>
+		<script type="text/javascript">
+			document.getElementById("createButton").onclick = function () {
+				location.href = "http://127.0.0.1:5000/createAccount";
+			};
+			function check(confirm){
+				if(form.Username.value == form.Password.value){
+					window.open('http://127.0.0.1:5000/home');
+				}
+				else{
+					alert("Incorrect Password or Username");
+				}
+			}
+		</script>
 </form>
-</footer>
-</html>
-    <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+{% endblock %}
 
-    
-    
-    
-  </body>
-</html>
+{% block scripts %}
+{{ super() }}
+<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+{% endblock %}
