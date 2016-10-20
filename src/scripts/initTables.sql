@@ -10,7 +10,8 @@ drop table if exists
 
 create table user(
 	userID int NOT NULL AUTO_INCREMENT, 
-    username varchar(50) NOT NULL UNIQUE, 
+    username varchar(50) NOT NULL UNIQUE,
+    password varchar(50) NOT NULL UNIQUE,	
     email varchar(50) NOT NULL UNIQUE, 
     fname varchar(50) NOT NULL, 
     lname varchar(50) NOT NULL, 
