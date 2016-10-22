@@ -7,21 +7,14 @@ from flaskext.mysql import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Our written additions
+from settings import app_setup
 from shopping_cart import ShoppingCart
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'test' # This really should go in a seperate file
+
+# Initialize Application
+app = app_setup()
 mysql = MySQL()
-app = Flask(__name__)
-
-#change user and password if needed
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
-app.config['MYSQL_DATABASE_DB'] = 'emq'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
-
-
 bootstrap = Bootstrap(app)
 
 @app.route('/')
@@ -59,8 +52,8 @@ def addUser():
          cursor = conn.cursor()
          #data = cursor.fetchone()
          if not cursor is None:
-
-             cursor.execute("INSERT INTO user (username,password,email,fname,lname,street,zip,city,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",(Username,hashed,Email,Fname,Lname,Street,Zip,City,State))
+             cursor.execute("INSERT INTO user (username,password,email,fname,lname,street,zip,city,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                     (Username,hashed,Email,Fname,Lname,Street,Zip,City,State))
              conn.commit()
              msg = "Record successfully added"
          else: 
@@ -115,7 +108,7 @@ def shopping_cart():
     if form.validate_on_submit():
         items = form.item_count.data
         form.item_count.data = 0 # Change to the updated value
-    return render_template('shopping_cart.html', form=form, items=items)
+    return render_template('shopping_cart.html', form=form, item_count=items)
 
 @app.route('/trackDelivery')
 def trackDelivery():
@@ -139,7 +132,6 @@ def list():
 
     return render_template("list.html",rows = rows)
                         
-
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
