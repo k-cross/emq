@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, jsonify
+from flask import Flask, render_template, request, redirect, jsonify, flash
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField
@@ -52,16 +52,26 @@ def addUser():
          cursor = conn.cursor()
          #data = cursor.fetchone()
          if not cursor is None:
-             cursor.execute("INSERT INTO user (username,password,email,fname,lname,street,zip,city,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+
+            cursor.execute("SELECT * FROM user WHERE username ='"+Username+"' OR email ='"+Email+"'")
+            row = cursor.fetchone ()
+            if row is not None:
+                flash("That username or Email is already taken, please choose another")
+                return render_template('createAccount.html')
+            else:
+             
+                cursor.execute("INSERT INTO user (username,password,email,fname,lname,street,zip,city,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                      (Username,hashed,Email,Fname,Lname,Street,Zip,City,State))
-             conn.commit()
-             msg = "Record successfully added"
-         else: 
-             msg = "error in insert operation"
+                flash ("Successfully registrated")
+                conn.commit()
+                #msg = "Record successfully added"
+         else:
+             flash ("error in insert operation")
+             #msg = "error in insert operation"
       
     
          conn.close()
-         return render_template("result.html",msg = msg)
+         return render_template("createAccount.html")
          
 
 @app.route('/login')
