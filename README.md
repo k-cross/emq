@@ -5,6 +5,7 @@
     * flask-bootstrap
     * flask-wtf
     * flask-script
+    * flask-mysql
 ## Setup
 * If you use a IDE or some fancy text editor that generates a lot of noise (temp files) then please add those files to the .gitignore so you don't accidentally upload them.
 * Check to make sure you have Selenium and Flask (>=v0.11)

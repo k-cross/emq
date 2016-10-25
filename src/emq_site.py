@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 # Our written additions
 from settings import app_setup
-from shopping_cart import ShoppingCart
+from site_functions.shopping_cart import ShoppingCart
 
 
 # Initialize Application
@@ -108,11 +108,13 @@ def shopping_cart():
     if form.validate_on_submit():
         items = form.item_count.data
         form.item_count.data = 0 # Change to the updated value
+        session['test_session'] = 'test_session'
+        return redirect(url_for('shopping_cart'))
     return render_template('shopping_cart.html', form=form, item_count=items)
 
 @app.route('/trackDelivery')
 def trackDelivery():
-    key = 'AIzaSyB7BkwSe4-5V14C3wY301HVolGN2IdO2PA'
+    key = app.config['google_maps']
     startLocation = '777 Story Rd, San Jose, CA 95122' # walmart
     endLocation = '1 Washington Sq, San Jose, CA 95192'  # SJSU
     try:
