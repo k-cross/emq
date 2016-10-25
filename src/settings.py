@@ -10,4 +10,6 @@ def app_setup():
         for line in f_csv:
             app.config[line[0]] = line[1]
 
+    app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+
     return app

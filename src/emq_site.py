@@ -1,5 +1,7 @@
-from flask import Flask, render_template, request, redirect, jsonify, flash
+from flask import Flask, render_template, request, redirect, jsonify, flash, url_for
+from flask import flash
 from flask_bootstrap import Bootstrap
+from flask_moment import Moment
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField
 from wtforms.validators import Required, NumberRange
@@ -16,6 +18,7 @@ app = app_setup()
 mysql = MySQL()
 mysql.init_app(app)
 bootstrap = Bootstrap(app)
+moment = Moment(app)
 
 @app.route('/')
 def home():
@@ -110,6 +113,7 @@ def checkUser():
     return render_template("result.html",msg = msg)
          
 
+# TODO: add session behavior
 @app.route('/cart', methods=['GET', 'POST'])
 def shopping_cart():
     items = None
@@ -118,9 +122,13 @@ def shopping_cart():
     if form.validate_on_submit():
         items = form.item_count.data
         form.item_count.data = 0 # Change to the updated value
-        session['test_session'] = 'test_session'
+        flash('Test warning message') # Really dont need this
         return redirect(url_for('shopping_cart'))
     return render_template('shopping_cart.html', form=form, item_count=items)
+
+@app.route('/products', methods=['GET', 'POST'])
+def products():
+    return render_template('products.html')
 
 @app.route('/trackDelivery')
 def trackDelivery():

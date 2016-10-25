@@ -1,4 +1,5 @@
 drop table if exists 	
+    cart,
     payment, 
     user,  
     transaction_details, 
@@ -11,7 +12,7 @@ drop table if exists
 create table user(
 	userID int NOT NULL AUTO_INCREMENT, 
     username varchar(50) NOT NULL UNIQUE,
-    password varchar(50) NOT NULL UNIQUE,	
+    password varchar(256) NOT NULL,	
     email varchar(50) NOT NULL UNIQUE, 
     fname varchar(50) NOT NULL, 
     lname varchar(50) NOT NULL, 
@@ -23,6 +24,7 @@ create table user(
 );
 
 /*might not even need this table if we have users enter this info on checkout*/    
+/*
 create table payment(
 	userID int NOT NULL, 
     card_number varchar(16) NOT NULL, 
@@ -32,6 +34,7 @@ create table payment(
     FOREIGN KEY (userID) REFERENCES USER(userID) on DELETE CASCADE,
     constraint p_ID primary key(userID, card_number)
 );
+*/
 
 create table transaction(
 	transID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -75,4 +78,10 @@ create table inventory_details(
     FOREIGN KEY (pID) REFERENCES inventory(pID) on DELETE CASCADE,
     foreign key (storeID) REFERENCES store(storeID) on DELETE CASCADE,
     constraint id_ID primary key (pID, storeID)
+);
+
+create table cart(
+	userId int NOT NULL,
+	pID int NOT NULL,
+	quantity int DEFAULT 1
 );

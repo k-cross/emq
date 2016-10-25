@@ -4,6 +4,7 @@
 [!] This doesn't account for electronic recycling fees 
 [!] This doesn't account for product weights
 '''
+from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField
 from wtforms.validators import Required, NumberRange
@@ -15,7 +16,11 @@ SHIPPING_RATE = 5.50
 class ShoppingCart(FlaskForm):
     # TODO: make item_count update based on items in sc db
     item_count = IntegerField("Update Cart", validators=[NumberRange(0, 10)])
+    #item_count = []
     submit = SubmitField('Submit')
+
+    
+    #item_count.append(IntegerField("Update Cart", validators=[NumberRange(0, 10)]))
 
     def calculateTotal(products, shipping_location):
         '''
