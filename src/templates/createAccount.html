@@ -5,10 +5,24 @@
 		{{ super() }}
 		<link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
 	{% endblock %}
-    
+    {% with messages = get_flashed_messages() %}
+	   {% if messages %}
+		  {% for message in messages %}
+			 {{ message }}
+		  {% endfor %}
+	   {% endif %}
+	{% endwith %}
    
 {% block content %}
-	    	
+	<center><h2>
+		{% with messages = get_flashed_messages() %}
+		   {% if messages %}
+			  {% for message in messages %}
+				 {{ message }}
+			  {% endfor %}
+		   {% endif %}
+		{% endwith %}
+	</h2></center>	
 	    	<div id="newProfile" class="col-sm-6 col-sm-offset-3">
 	    		<h1 align = "center">Create Account</h1>
 	    		<!-- new profile -->
