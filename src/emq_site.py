@@ -7,11 +7,11 @@ from wtforms import StringField, SubmitField, IntegerField
 from wtforms.validators import Required, NumberRange
 from flaskext.mysql import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from datetime import datetime
 # Our written additions
 from settings import app_setup
 from site_functions.shopping_cart import ShoppingCart
-
+import order
 
 # Initialize Application
 app = app_setup()
@@ -130,13 +130,25 @@ def shopping_cart():
 def products():
     return render_template('products.html')
 
+@app.route('/locations')
+def locations():
+	try:
+		storeLocations = ['30600 Dyer St, Union City, CA 94587', 'West Gate San Leandro, 1919 Davis St, San Leandro, CA 94577', '40580 Albrae St, Fremont, CA 94538', '777 Story rd, San Jose', '301 Ranch Dr, Milpitas, CA 95035', '600 Showers Dr, Mountain View, CA', '4080 Stevens Creek Blvd, San Jose, CA 95128', 'Woodside Central, 2485 El Camino Real, Redwood City, CA 94063', 'Bridgepointe Shopping Center, 2220 Bridgepointe Pkwy, San Mateo, CA 94404', '1150 El Camino Real, San Bruno, CA 94066', '1830 Ocean Ave, San Francisco, CA 94112', '2675 Geary Blvd, San Francisco, CA 94118', '2700 5th St, Alameda, CA 94501']
+		return render_template('locations.html', key=app.config['google_maps'], storeLocations=storeLocations)
+	except Exception as e:
+		print(e)
+
 @app.route('/trackDelivery')
 def trackDelivery():
-    key = app.config['google_maps']
-    startLocation = '777 Story Rd, San Jose, CA 95122' # walmart
-    endLocation = '1 Washington Sq, San Jose, CA 95192'  # SJSU
+
     try:
-        return render_template('map.html', key=key, startLocation=startLocation, endLocation=endLocation)
+		items1 = ['item1', 'item2', 'item3']
+		orderPlacedTime1 = datetime.strptime('2016-10-25 16:17:00', '%Y-%m-%d %H:%M:%S')
+		deliveryAddress = '1 Washington Square, San Jose, CA'
+		order1 = order.Order(items1, 52, orderPlacedTime1, *order.getDeliveryInfo(deliveryAddress))
+		#print (order1.getDeliveryStatus())
+		#print (order1.getCurrentLocation())
+		return render_template('map.html', key=app.config['google_maps'], order1=order1)
     except Exception as e:
         print(e)
 
