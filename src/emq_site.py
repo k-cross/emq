@@ -117,14 +117,14 @@ def checkUser():
 @app.route('/cart', methods=['GET', 'POST'])
 def shopping_cart():
     items = None
-    form = ShoppingCart()
+    form = ShoppingCart(mysql)
 
     if form.validate_on_submit():
         items = form.item_count.data
         form.item_count.data = 0 # Change to the updated value
         flash('Test warning message') # Really dont need this
         return redirect(url_for('shopping_cart'))
-    return render_template('shopping_cart.html', form=form, item_count=items)
+    return render_template('shopping_cart.html', form=form, form.item_count=items)
 
 @app.route('/products', methods=['GET', 'POST'])
 def products():
