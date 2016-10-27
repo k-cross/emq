@@ -18,10 +18,10 @@ class ShoppingCart(FlaskForm):
     item_count = IntegerField("Update Cart", validators=[NumberRange(0, 10)])
     submit = SubmitField('Submit')
 
-    def __init__(self, mysql):
+    #def __init__(self):
         # TODO: make item_count update based on items in sc db
         #self.db_connection = mysql.connect()
-        self.cursor = mysql.get_db().cursor()
+        #self.cursor = mysql.get_db().cursor()
         #self.item_count = IntegerField("Update Cart", validators=[NumberRange(0, 10)])
         #self.submit = SubmitField('Submit')
         #item_count = []

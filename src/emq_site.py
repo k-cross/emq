@@ -11,7 +11,7 @@ from datetime import datetime
 # Our written additions
 from settings import app_setup
 from site_functions.shopping_cart import ShoppingCart
-import order
+from site_functions import order
 
 # Initialize Application
 app = app_setup()
@@ -38,7 +38,6 @@ def createAccount():
 def addUser():
    msg = "test"
    if request.method == 'POST':
-         
          Username = request.form['username']
          Password = request.form['userpassword']
          Fname = request.form['userfname']
@@ -55,23 +54,21 @@ def addUser():
          cursor = conn.cursor()
          #data = cursor.fetchone()
          if not cursor is None:
-
-            cursor.execute("SELECT * FROM user WHERE username ='"+Username+"' OR email ='"+Email+"'")
+            cursor.execute("SELECT * FROM user WHERE username ='" 
+                    + Username + "' OR email ='" + Email + "'")
             row = cursor.fetchone ()
             if row is not None:
-                flash("That username or Email is already taken, please choose another")
+                flash("That Username or Email is already taken")
                 return render_template('createAccount.html')
             else:
-             
-                cursor.execute("INSERT INTO user (username,password,email,fname,lname,street,zip,city,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                cursor.execute("INSERT INTO user (username,password,email,fname,lname,"
+                     + "street,zip,city,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                      (Username,hashed,Email,Fname,Lname,Street,Zip,City,State))
                 flash ("Successfully registrated")
                 conn.commit()
                 #msg = "Record successfully added"
          else:
-             flash ("error in insert operation")
-             #msg = "error in insert operation"
-      
+             flash ("Error during insert operation")
     
          conn.close()
          return render_template("createAccount.html")
@@ -117,14 +114,14 @@ def checkUser():
 @app.route('/cart', methods=['GET', 'POST'])
 def shopping_cart():
     items = None
-    form = ShoppingCart(mysql)
+    form = ShoppingCart()
 
     if form.validate_on_submit():
         items = form.item_count.data
         form.item_count.data = 0 # Change to the updated value
         flash('Test warning message') # Really dont need this
         return redirect(url_for('shopping_cart'))
-    return render_template('shopping_cart.html', form=form, form.item_count=items)
+    return render_template('shopping_cart.html', form=form, item_count=items)
 
 @app.route('/products', methods=['GET', 'POST'])
 def products():
@@ -133,7 +130,20 @@ def products():
 @app.route('/locations')
 def locations():
     try:
-        storeLocations = ['30600 Dyer St, Union City, CA 94587', 'West Gate San Leandro, 1919 Davis St, San Leandro, CA 94577', '40580 Albrae St, Fremont, CA 94538', '777 Story rd, San Jose', '301 Ranch Dr, Milpitas, CA 95035', '600 Showers Dr, Mountain View, CA', '4080 Stevens Creek Blvd, San Jose, CA 95128', 'Woodside Central, 2485 El Camino Real, Redwood City, CA 94063', 'Bridgepointe Shopping Center, 2220 Bridgepointe Pkwy, San Mateo, CA 94404', '1150 El Camino Real, San Bruno, CA 94066', '1830 Ocean Ave, San Francisco, CA 94112', '2675 Geary Blvd, San Francisco, CA 94118', '2700 5th St, Alameda, CA 94501']
+        storeLocations = [
+                '30600 Dyer St, Union City, CA 94587', 
+                'West Gate San Leandro, 1919 Davis St, San Leandro, CA 94577', 
+                '40580 Albrae St, Fremont, CA 94538', 
+                '777 Story rd, San Jose', 
+                '301 Ranch Dr, Milpitas, CA 95035', 
+                '600 Showers Dr, Mountain View, CA',
+                '4080 Stevens Creek Blvd, San Jose, CA 95128', 
+                'Woodside Central, 2485 El Camino Real, Redwood City, CA 94063', 
+                'Bridgepointe Shopping Center, 2220 Bridgepointe Pkwy, San Mateo, CA 94404',
+                '1150 El Camino Real, San Bruno, CA 94066',
+                '1830 Ocean Ave, San Francisco, CA 94112',
+                '2675 Geary Blvd, San Francisco, CA 94118',
+                '2700 5th St, Alameda, CA 94501']
         return render_template('locations.html', key=app.config['google_maps'], storeLocations=storeLocations)
     except Exception as e:
         print(e)
@@ -144,7 +154,8 @@ def trackDelivery():
         items1 = ['item1', 'item2', 'item3']
         orderPlacedTime1 = datetime.strptime('2016-10-25 16:17:00', '%Y-%m-%d %H:%M:%S')
         deliveryAddress = '1 Washington Square, San Jose, CA'
-        order1 = order.Order(items1, 52, orderPlacedTime1, *order.getDeliveryInfo(deliveryAddress))
+        order1 = order.Order(items1, 52, orderPlacedTime1, 
+                *order.getDeliveryInfo(deliveryAddress))
         #print (order1.getDeliveryStatus())
         #print (order1.getCurrentLocation())
         return render_template('map.html', key=app.config['google_maps'], order1=order1)
@@ -156,10 +167,6 @@ def list():
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT * from user")
     rows = cursor.fetchall(); 
-
-    for row in rows:
-        #rows.append(row)
-        print(row)
 
     return render_template("list.html",rows = rows)
                         
