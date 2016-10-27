@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, jsonify, flash, url_for
-from flask import flash
+from flask import flash, session
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_wtf import FlaskForm
@@ -33,6 +33,88 @@ def createAccount():
         return render_template('createAccount.html')
     except Exception as e:
         print(e)
+
+
+
+@app.route('/login')
+def login():
+    try:
+        return render_template('login.html')
+    except Exception as e:
+        print(e)
+
+@app.route('/logout')
+def logout():
+    try:
+        if 'username' in session:
+            
+            session.pop('username', None)
+            session.pop('userid', None)
+            return render_template('login.html')
+        else:
+            flash("Please login first!")
+            return redirect(url_for('home'))
+    except Exception as e:
+        print(e)
+
+@app.route('/profile')
+def profile():
+    try:
+        if 'username' in session:
+            conn = mysql.connect()
+            cursor = conn.cursor()
+                 
+            if not cursor is None:
+
+                cursor.execute("Select email,fname,lname,street,zip,city,state from user where username='"+session['username']+"'")
+                    
+                row = cursor.fetchone ()
+                
+            conn.close()
+            return render_template('profile.html',username=session['username'], email=row[0], fname=row[1], lname=row[2], street=row[3], zip=row[4], city=row[5], state=row[6])     
+
+        else:
+            flash("Please login first!")
+            return redirect(url_for('home'))
+
+    except Exception as e:
+        print(e)
+
+
+
+@app.route('/checkUser',methods = ['POST', 'GET'])
+def checkUser():
+    Username = request.form['username']
+    Password = request.form['pass']
+    
+    conn = mysql.connect()
+    cursor = conn.cursor()
+         
+    if not cursor is None:
+
+        cursor.execute("Select password,userID from user where username='"+Username+"'")
+            
+        row = cursor.fetchone ()
+        
+        if not row is None:
+            hashed = row[0]
+            print(hashed)
+            #print(generate_password_hash(Password))
+            matches = check_password_hash(hashed, Password)
+
+            if matches:
+                flash("Hello, "+Username+"! Welcome!!")
+                session['username'] = Username
+                session['userid'] = row[1]
+                print(session['username'],session['userid'])
+            else:
+                flash("Username or Password is wrong")
+                return render_template("login.html")
+        else:
+            flash("UserName doesn't exist")
+            return render_template("login.html")
+    conn.close()
+    return redirect(url_for('home'))
 
 @app.route('/addUser',methods = ['POST', 'GET'])
 def addUser():
@@ -72,43 +154,33 @@ def addUser():
     
          conn.close()
          return render_template("createAccount.html")
-         
 
-@app.route('/login')
-def login():
-    try:
-        return render_template('login.html')
-    except Exception as e:
-        print(e)
-
-@app.route('/checkUser',methods = ['POST', 'GET'])
-def checkUser():
-    Username = request.form['username']
-    Password = request.form['pass']
-    
-    conn = mysql.connect()
-    cursor = conn.cursor()
-         
-    if not cursor is None:
-
-        cursor.execute("Select password from user where username='"+Username+"'")
+@app.route('/updateUser',methods = ['POST', 'GET'])
+def updateUser():
+   msg = "test"
+   if request.method == 'POST':
+         Fname = request.form['userfname']
+         Lname = request.form['userlname']
+         Street = request.form['street']
+         Zip = int(request.form['zip'])
+         City = request.form['city']
+         State = request.form['state']
+         print(Fname,Lname,Street,Zip,City,State)
+           
+         conn = mysql.connect()
+         cursor = conn.cursor()
+         #data = cursor.fetchone()
+         if not cursor is None:
+            cursor.execute("UPDATE user SET fname=%s,lname=%s,street=%s,zip=%s,city=%s,state=%s",
+                     (Fname,Lname,Street,Zip,City,State))
+            flash ("Information Updated")
+            conn.commit()
+                
+         else:
+            flash ("error in Update operation")
             
-        row = cursor.fetchone ()
-        if not row is None:
-            hashed = row[0]
-            print(hashed)
-            #print(generate_password_hash(Password))
-            matches = check_password_hash(hashed, Password)
-
-            if matches:
-                msg = "Login successful"
-            else:
-                msg = "Username or Password is wrong"
-        else:
-            msg = "the user is not in the database"
-    conn.close()
-    return render_template("result.html",msg = msg)
-         
+         conn.close()
+         return redirect(url_for('profile'))
 
 # TODO: add session behavior
 @app.route('/cart', methods=['GET', 'POST'])

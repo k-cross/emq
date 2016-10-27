@@ -1,21 +1,39 @@
 {% extends "bootstrap/base.html" %}
 
 {% block navbar %}
-  <div class="navbar navbar-inverse" role="navigation">
+  <div class="navbar navbar-inverse nav-style" role="navigation">
     <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle"
-         data-toggle="collapse" data-target=".navbar-collapse">
-        </button>
-        <a class="navbar-brand" href="/">Home</a>
-        <a class="navbar-brand" href="/products">Products</a>
-        <a class="navbar-brand" href="/about">About Us</a>
-        <a class="navbar-brand" href="/contact">Contact</a>
-        <a class="navbar-brand" href="/login">Log In</a> <!-- Need to change this for dynamic update upon changes -->
-        <a class="navbar-brand" href="/createAccount">Register</a>
-        <a class="navbar-brand" href="/cart">Shopping Cart</a>
-		<a class="navbar-brand" href="/listUser">list</a>
-      </div>
+		<div class="navbar-header">
+		 <button type="button" class="navbar-toggle"
+			 data-toggle="collapse" data-target=".navbar-collapse">
+			 <span class="sr-only">Toggle navigation</span>
+			 <span class="icon-bar"></span>
+			 <span class="icon-bar"></span>
+			 <span class="icon-bar"></span>
+		 </button>
+		 <a class="navbar-brand" href="http://localhost:5000/">Store</a>
+		</div>
+		
+		<div class="navbar-collapse collapse">
+			<ul class="nav navbar-nav navbar-left">
+				<li><a class="navbar-brand" href="/">Home</a></li>
+				<li><a class="navbar-brand" href="/products">Products</a></li>
+				<li><a class="navbar-brand" href="/about">About Us</a></li>
+				<li><a class="navbar-brand" href="/contact">Contact</a></li>
+				<li><a class="navbar-brand" href="/cart">Shopping Cart</a></li>
+				<li><a class="navbar-brand" href="/listUser">list</a></li>
+			</ul>
+			
+			<ul class="nav navbar-nav navbar-right">
+				{% if not session['userid']%}
+					<li><a class="navbar-brand" href="/login">Log In</a></li> <!-- Need to change this for dynamic update upon changes -->
+					<li><a class="navbar-brand" href="/createAccount">Register</a></li>
+				{% else %}
+					<li><a class="navbar-brand" href="/profile">Profile</a></li>
+					<li><a class="navbar-brand" href="/logout">Sign Out</a></li>
+				{% endif %}
+			</ul>
+		</div>
     </div>
   </div>
 {% endblock %}
@@ -45,9 +63,13 @@
 {{ super() }}
 <!-- Super is for flask-bootstrap -->
 {{ moment.include_moment() }}
+ {% block page_scripts %}{% endblock %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 {% endblock %}
 
 {% block styles %}
-{{ super() }}
-<!-- Super is for flask-bootstrap -->
+	{{ super() }}
+	<!-- Super is for flask-bootstrap -->
+	<link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+
 {% endblock %}

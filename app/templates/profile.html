@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}EMQ Sign in{% endblock %}
+
+{% block styles %}
+	{{ super() }}
+	<!-- Super is for flask-bootstrap -->
+	<link href="{{ url_for('static', filename='profile-style.css') }}" rel="stylesheet">
+
+{% endblock %}   
+   
+{% block page_content %}
+
+    <div class="row profile">
+		<div class="col-md-3">
+			<div class="profile-sidebar">
+
+				<!-- SIDEBAR USER TITLE -->
+				<div class="profile-usertitle">
+					<div class="profile-user-text">
+						<h3>Hi! {{ username }}</h3>
+					</div>
+					
+					<br>
+					
+					<div class="profile-user-text">
+						Email: {{ email }}
+					</div>
+					
+					<div class="profile-user-text">
+						Name: {{ fname}}, {{lname}}
+					</div>
+					<br>
+					<div class="profile-user-address">
+						{{street}}, {{city}}
+						<br>
+						{{state}},{{zip}}
+					</div>
+				</div>
+				<!-- END SIDEBAR USER TITLE -->
+				<!-- SIDEBAR BUTTONS -->
+				<div class="profile-userbuttons">
+					<button type="button" class="btn btn-success btn-sm" onclick="">
+						<i class="glyphicon glyphicon-credit-card"></i>
+						CheckOut
+					</button>
+					<button type="button" class="btn btn-info btn-sm" onclick="location.href='{{ url_for('shopping_cart') }}'">
+						<i class="glyphicon glyphicon-shopping-cart"></i>
+						Shopping Cart
+					</button>
+				</div>
+				<!-- END SIDEBAR BUTTONS -->
+				<!-- SIDEBAR MENU -->
+				<div class="profile-usermenu">
+					<ul class="nav">
+						<li id="overview_btn" >
+							
+							<i class="glyphicon glyphicon-home"></i>
+							Overview
+						</li>
+						<li id="account_update_btn">
+							<i class="glyphicon glyphicon-user"></i>
+							Account Settings 
+						</li>
+						<li id="order_history_btn">
+							
+							<i class="glyphicon glyphicon-ok"></i>
+							Order History 
+						</li>
+						<li id="tracking_btn">
+							<a href="/trackDelivery">
+							<i class="glyphicon glyphicon-road"></i>
+							Tracking Package </a>
+						</li>
+					</ul>
+				</div>
+				<!-- END MENU -->
+			</div>
+		</div>
+		<div class="col-md-9">
+            <div class="profile-content">
+				
+				<div id="profile-other">
+					Some user related content goes here...
+				</div>
+				
+				<!-- updating only show when account setting button is clicked -->
+				<div id="profile-updating">
+					<center><h2>Account information</h2></center>
+					<form name="newprofile1" action = "{{ url_for('updateUser') }}" method = "POST">
+						 <!-- FIRST LAST NAME -->
+						<div class="form-group">
+							<label for="userfname" class="control-label">First Name</label>
+							<input type="text" name="userfname" id="userfname" class="form-control " placeholder="First Name" value="{{ fname }}" required>
+							<br>
+							<label for="userlname" class="control-label">Last Name</label>
+							<input type="text" name="userlname" id="userlname" class="form-control " placeholder="Last Name" value="{{ lname }}" required>
+						</div>
+						
+						<div class="form-group">
+						<label for="street" class="control-label">Street</label>
+						  <input type="text" name="street" id="street" class="form-control " placeholder="Street" value="{{ street }}" required>
+						</div>
+						
+						<div class="form-group">
+						<label for="zip" class="control-label">ZIP</label>
+						  <input type="number" name="zip" min="0" max="99999" id="zip" class="form-control " placeholder="ZIP" value="{{ zip }}"  required>
+						</div>
+						
+						<div class="form-group">
+						<label for="city" class="control-label">City</label>
+						  <input type="text" name="city" id="city" class="form-control " placeholder="City" value="{{ city }}" required>
+						</div>
+						
+						<div class="form-group">
+						<label for="state" class="control-label">State</label>
+						  <input type="text" name="state" id="state" class="form-control " placeholder="State" value="{{ state }}"  required title="Two Characters Only" pattern="[A-Za-z]{2}">
+						</div>
+						
+						<br>
+						<br>
+						<!--<button id="sendDataButton" type="button" class="btn pull-right">Create Account</button-->
+						<input type = "submit"  class="button buttonBlue" value = "Update" />
+								
+					</form>
+			   
+				</div>
+				
+				
+            </div>
+		</div>
+	</div>
+
+<center>
+</center>
+<br>
+<br>
+
+{% endblock %} 
+
+{% block page_scripts %}
+	<script type="text/javascript">
+			
+			//document.getElementById('overview_btn').onclick = (function(){
+			//	document.getElementById("profile-other").style.display = "block";
+			//	document.getElementById("profile-updating").style.display = "none";
+			//});
+			
+			document.getElementById('account_update_btn').onclick = (function(){
+				alert("this is testing");
+				if (document.getElementById('profile-updating').style.display === 'none') {
+					document.getElementById("profile-updating").style.display = "block";
+					document.getElementById("profile-other").style.display = "none";
+				}else{
+					document.getElementById("profile-other").style.display = "none";
+					document.getElementById("profile-updating").style.display = "block";
+				}
+				
+				//document.getElementById("profile-other").style.display = "none";
+			});
+			
+			//document.getElementById('tracking_btn').onclick = (function(){
+			//	document.getElementById("profile-other").style.display = "block";
+			//	document.getElementById("profile-updating").style.display = "none";
+			//});
+
+			//document.getElementById('order_history_btn').onclick = (function(){
+			//	document.getElementById("profile-other").style.display = "block";
+			///	document.getElementById("profile-updating").style.display = "none";
+			//});
+			
+	</script>
+{% endblock %} 

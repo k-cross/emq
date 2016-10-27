@@ -1,13 +1,7 @@
 {% extends "base.html" %}
 {% block title %}EMQ Sign in{% endblock %}
 
-    {% block styles %}
-		{{ super() }}
-		<link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
-	{% endblock %}
-    
-   
-{% block content %}
+{% block page_content %}
 
 <form name="login" action = "{{ url_for('checkUser') }}" method = "POST">
 	<div class="form-group">

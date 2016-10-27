@@ -32,6 +32,11 @@ nav{
 	width:100%;
 }
 
+.nav-style{
+	background-color:#34495e;
+	width:100%;
+}
+
 nav ul li{
 	position:relative;
 	left:25%;
@@ -49,7 +54,22 @@ nav ul li:hover{
 	border-bottom:solid 2px white;
 	color:#ecf0f1;
 	cursor:pointer;
-	padding-bottom:10px;
+	padding-bottom:5px;
+
+}
+
+.nav-style ul li{
+	left:17%;
+	padding:0px 11px;
+	border-right: solid #2c3e50 2px;
+	-webkit-transition: all .5s;
+}
+
+.nav-style ul li:hover{
+	border-bottom:solid 2px white;
+	color:#ecf0f1;
+	cursor:pointer;
+	padding-bottom:1px;
 
 }
 
