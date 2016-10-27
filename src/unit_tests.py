@@ -16,5 +16,8 @@ class ShoppingCartUnitTest(unittest.TestCase):
     def test_shopping_cart_for_problems(self):
         pass
 
+    def test_shopping_cart_gathers_user_information(self):
+        self.AssertFail('write the test')
+
 if __name__ == '__main__':
     unittest.main(warnings='ignore')
