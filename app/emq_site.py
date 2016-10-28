@@ -118,7 +118,6 @@ def checkUser():
 
 @app.route('/addUser',methods = ['POST', 'GET'])
 def addUser():
-   msg = "test"
    if request.method == 'POST':
          Username = request.form['username']
          Password = request.form['userpassword']
@@ -148,7 +147,6 @@ def addUser():
                      (Username,hashed,Email,Fname,Lname,Street,Zip,City,State))
                 flash ("Successfully registrated")
                 conn.commit()
-                #msg = "Record successfully added"
          else:
              flash ("Error during insert operation")
     
@@ -157,7 +155,6 @@ def addUser():
 
 @app.route('/updateUser',methods = ['POST', 'GET'])
 def updateUser():
-   msg = "test"
    if request.method == 'POST':
          Fname = request.form['userfname']
          Lname = request.form['userlname']
@@ -186,9 +183,10 @@ def updateUser():
 @app.route('/cart', methods=['GET', 'POST'])
 def shopping_cart():
     items = None
-    form = ShoppingCart()
+    cart = ShoppingCart(mysql)
+    form = cart.form
 
-    if form.validate_on_submit():
+    if cart.form.validate_on_submit():
         items = form.item_count.data
         form.item_count.data = 0 # Change to the updated value
         flash('Test warning message') # Really dont need this

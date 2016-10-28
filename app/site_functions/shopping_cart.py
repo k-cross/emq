@@ -14,23 +14,15 @@ from wtforms.validators import Required, NumberRange
 # GLOBALS
 SHIPPING_RATE = 5.50
 
-class ShoppingCart(FlaskForm):
+class ShoppingCartForm(FlaskForm):
     item_count = IntegerField("Update Cart", validators=[NumberRange(0, 10)])
     submit = SubmitField('Submit')
 
-    #def __init__(self):
-        # TODO: make item_count update based on items in sc db
-        #self.db_connection = mysql.connect()
-        #self.cursor = mysql.get_db().cursor()
-        #self.item_count = IntegerField("Update Cart", validators=[NumberRange(0, 10)])
-        #self.submit = SubmitField('Submit')
-        #item_count = []
-        
-        #item_count.append(
-        #    for items in db:
-        #        IntegerField("Update Cart", validators=[NumberRange(0, 10)]))
-
-        #self.db_connection.close()
+class ShoppingCart:
+    def __init__(self, mysql):
+        self.connection = mysql.connect()
+        self.cursor = self.connection.cursor()
+        self.form = ShoppingCartForm()
 
     def calculateTotal(products, shipping_location):
         '''
@@ -49,3 +41,5 @@ class ShoppingCart(FlaskForm):
 
         total = subtotal + (subtotal * taxRate) + SHIPPING_RATE
         return total
+
+
