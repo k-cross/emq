@@ -11,6 +11,9 @@
 * Check to make sure you have Selenium and Flask (>=v0.11)
     * You can try the command in your native cli: "pip install flask"
     * You can try the command in your native cli: "pip install selenium"
+* Test User
+    * Login as 'a' and pw is 'a'
+    * Cart is automatically filled with 3 items of pID 1 and 2 of pID 2
 ### Using Virtual Environment
 * Create Environment
     * virtualenv venv

@@ -80,8 +80,9 @@ create table inventory_details(
     constraint id_ID primary key (pID, storeID)
 );
 
+/* Make un a fk with users */
 create table cart(
-	userId int NOT NULL,
+    username varchar(50) NOT NULL,
 	pID int NOT NULL,
 	quantity int DEFAULT 1
 );

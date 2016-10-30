@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 # Our written additions
 from settings import app_setup
-from site_functions.shopping_cart import ShoppingCart
+from site_functions.shopping_cart import ShoppingCart, CheckoutForm
 from site_functions import order
 
 # Initialize Application
@@ -99,7 +99,6 @@ def checkUser():
         if not row is None:
             hashed = row[0]
             print(hashed)
-            #print(generate_password_hash(Password))
             matches = check_password_hash(hashed, Password)
 
             if matches:
@@ -172,26 +171,50 @@ def updateUser():
                      (Fname,Lname,Street,Zip,City,State))
             flash ("Information Updated")
             conn.commit()
-                
          else:
             flash ("error in Update operation")
             
          conn.close()
          return redirect(url_for('profile'))
 
-# TODO: add session behavior
+@app.route('/confirmation')
+def order_confirmation():
+    return render_template('order_confirmation.html')
+
+#TODO: complete function / currently broken
+@app.route('/checkout', methods=['GET', 'POST'])
+def checkout():
+    information_query = 'SELECT pid FROM products, cart WHERE cart.pid=product.pid and username={}'
+    transaction_query = "INSERT INTO transaction (userID, total_price, status) VALUES ('{}', '{}', '{}')"
+    form = CheckoutForm()
+
+    if form.validate_on_submit():
+        connection = mysql.connect()
+        cursor = connection.cursor()
+
+        cursor.execute(information_query.format(session['username']))
+
+        cc = form.credit_card.data
+        ct = form.card_type.data
+
+        cursor.execute(transaction_query.format(session['userid'], 
+            session['total'], 'Pending'))
+        cursor.commit()
+        connection.close()
+
+        return redirect(url_for('shopping_cart'))
+    return render_template('checkout.html', form=form)
+
+#TODO: Redirect to checkout when complete
 @app.route('/cart', methods=['GET', 'POST'])
 def shopping_cart():
     items = None
-    cart = ShoppingCart(mysql)
+    cart = ShoppingCart(mysql, session)
     form = cart.form
 
-    if cart.form.validate_on_submit():
-        items = form.item_count.data
-        form.item_count.data = 0 # Change to the updated value
-        flash('Test warning message') # Really dont need this
+    if form.validate_on_submit():
         return redirect(url_for('shopping_cart'))
-    return render_template('shopping_cart.html', form=form, item_count=items)
+    return render_template('shopping_cart.html', form=form)
 
 @app.route('/products', methods=['GET', 'POST'])
 def products():
