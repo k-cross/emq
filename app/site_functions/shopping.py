@@ -22,7 +22,7 @@ class ShoppingCartFailForm(FlaskForm):
 class CheckoutForm(FlaskForm):
     credit_card = IntegerField("Credit Card", 
             validators=[NumberRange(1000000000000000, 9999999999999999)])
-    card_type = SelectField(choices=['VISA','MASTERCARD'])
+    card_type = SelectField(validators=[Required()], choices=[(1, 'VISA'), (2, 'MASTERCARD')])
     checkout_btn = SubmitField('Checkout')
 
 

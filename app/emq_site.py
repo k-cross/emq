@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 # Our written additions
 from settings import app_setup
-from site_functions.shopping_cart import ShoppingCart, CheckoutForm
+from site_functions.shopping import ShoppingCart, CheckoutForm
 from site_functions import order
 
 # Initialize Application
