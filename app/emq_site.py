@@ -20,12 +20,14 @@ mysql.init_app(app)
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 
+
 @app.route('/')
 def home():
     try:
         return render_template('home.html')
     except Exception as e:
         print(e)
+
 
 @app.route('/createAccount')
 def createAccount():
@@ -35,7 +37,6 @@ def createAccount():
         print(e)
 
 
-
 @app.route('/login')
 def login():
     try:
@@ -43,11 +44,11 @@ def login():
     except Exception as e:
         print(e)
 
+
 @app.route('/logout')
 def logout():
     try:
         if 'username' in session:
-            
             session.pop('username', None)
             session.pop('userid', None)
             return render_template('login.html')
@@ -56,6 +57,7 @@ def logout():
             return redirect(url_for('home'))
     except Exception as e:
         print(e)
+
 
 @app.route('/profile')
 def profile():
@@ -79,7 +81,6 @@ def profile():
 
     except Exception as e:
         print(e)
-
 
 
 @app.route('/checkUser',methods = ['POST', 'GET'])
@@ -114,6 +115,7 @@ def checkUser():
             return render_template("login.html")
     conn.close()
     return redirect(url_for('home'))
+
 
 @app.route('/addUser',methods = ['POST', 'GET'])
 def addUser():
@@ -152,6 +154,7 @@ def addUser():
          conn.close()
          return render_template("createAccount.html")
 
+
 @app.route('/updateUser',methods = ['POST', 'GET'])
 def updateUser():
    if request.method == 'POST':
@@ -177,33 +180,40 @@ def updateUser():
          conn.close()
          return redirect(url_for('profile'))
 
+
 @app.route('/confirmation')
 def order_confirmation():
+    # Need to handle true validation / or we just assume it works and outside our scope
     return render_template('order_confirmation.html')
+
 
 #TODO: complete function / currently broken
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
-    information_query = 'SELECT pid FROM products, cart WHERE cart.pid=product.pid and username={}'
-    transaction_query = "INSERT INTO transaction (userID, total_price, status) VALUES ('{}', '{}', '{}')"
-    form = CheckoutForm()
+    if 'username' in session:
+        form = CheckoutForm()
 
-    if form.validate_on_submit():
-        connection = mysql.connect()
-        cursor = connection.cursor()
+        if form.validate_on_submit():
+            connection = mysql.connect()
+            cursor = connection.cursor()
 
-        cursor.execute(information_query.format(session['username']))
+            # TODO: Replace with shopping cart function logic
+            cursor.execute(information_query.format(session['username']))
 
-        cc = form.credit_card.data
-        ct = form.card_type.data
+            cc = form.credit_card.data
+            ct = form.card_type.data
 
-        cursor.execute(transaction_query.format(session['userid'], 
-            session['total'], 'Pending'))
-        cursor.commit()
-        connection.close()
+            # TODO: Replace with shopping cart function logic
+            cursor.execute(transaction_query.format(session['userid'], 
+                session['total'], 'Pending'))
+            cursor.commit()
+            connection.close()
 
-        return redirect(url_for('shopping_cart'))
-    return render_template('checkout.html', form=form)
+            return redirect(url_for('shopping_cart'))
+        return render_template('checkout.html', form=form)
+    else:
+        return redirect(url_for('login'))
+
 
 #TODO: Redirect to checkout when complete
 @app.route('/cart', methods=['GET', 'POST'])
@@ -213,12 +223,15 @@ def shopping_cart():
     form = cart.form
 
     if form.validate_on_submit():
+        print(cart.calculate_total())
         return redirect(url_for('shopping_cart'))
     return render_template('shopping_cart.html', form=form)
+
 
 @app.route('/products', methods=['GET', 'POST'])
 def products():
     return render_template('products.html')
+
 
 @app.route('/locations')
 def locations():
@@ -241,6 +254,7 @@ def locations():
     except Exception as e:
         print(e)
 
+
 @app.route('/trackDelivery')
 def trackDelivery():
     try:
@@ -255,6 +269,7 @@ def trackDelivery():
     except Exception as e:
         print(e)
 
+
 @app.route('/listUser')
 def list():
     cursor = mysql.connect().cursor()
@@ -263,13 +278,16 @@ def list():
 
     return render_template("list.html",rows = rows)
                         
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
  
+
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template('500.html'), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

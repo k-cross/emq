@@ -13,6 +13,7 @@ from wtforms.validators import Required, NumberRange
 
 # GLOBALS
 SHIPPING_RATE = 5.50
+TAX_RATE = 0.095
 
 #TODO: Display separate user not logged in form or redirect to login
 class ShoppingCartFailForm(FlaskForm):
@@ -22,33 +23,35 @@ class ShoppingCartFailForm(FlaskForm):
 class CheckoutForm(FlaskForm):
     credit_card = IntegerField("Credit Card", 
             validators=[NumberRange(1000000000000000, 9999999999999999)])
-    card_type = SelectField(validators=[Required()], choices=[(1, 'VISA'), (2, 'MASTERCARD')])
+    card_type = SelectField(choices=[(1, 'VISA'), (2, 'MASTERCARD')])
     checkout_btn = SubmitField('Checkout')
 
 
 class ShoppingCartForm(FlaskForm):
-    #item_count = IntegerField("Update Cart", validators=[NumberRange(0, 10)])
+    # TODO: Add checkout button
     update_btn = SubmitField('Update')
+    checkout_btn = SubmitField('Checkout')
 
 
 class ShoppingCart:
     def __init__(self, mysql, session):
-        self.connection = mysql.connect()
-        self.cursor = self.connection.cursor()
+        self.queries = {
+                'grab_items' : "SELECT pname, cart.pid, price, quantity FROM cart, "
+                    + "inventory WHERE username='{}' and cart.pID=inventory.pID",
+                'transaction_query' : "INSERT INTO transaction (userID, total_price, "
+                    + "status) VALUES ('{}', '{}', '{}')"
+                }
+
+        self.mysql = mysql
         self.session = session
         self.cart = None
-
-        self.get_cart_objects()
-
-        self.form_fields = 0
+        self.get_items()
 
         # Do this after the database has been queried for info
-        #item_count = IntegerField("Update Cart", validators=[NumberRange(0, 10)])
-
         self.form = ShoppingCartForm()
 
 
-    def calculateTotal(products, shipping_location):
+    def calculate_total(self):
         '''
         [*] Calculates the total at checkout
 
@@ -57,23 +60,31 @@ class ShoppingCart:
 
         subtotal = 0.0
         total = 0.0
-        taxRate = 0.0
 
-        for product in products:
-            subtotal += product.price
+        for i in range(0, len(self.cart)):
+            subtotal += float(self.cart[i][2]) * self.cart[i][3]
 
-        total = subtotal + (subtotal * taxRate) + SHIPPING_RATE
-        return total
+        total = subtotal + (subtotal * TAX_RATE) + SHIPPING_RATE
+        return total, subtotal, TAX_RATE, SHIPPING_RATE
 
-    def get_cart_objects(self):
-        grab_items_query = "SELECT * FROM cart WHERE username = '{}'"
+    def get_items(self):
+        connection = self.mysql.connect()
+        cursor = connection.cursor()
 
         if 'username' in self.session:
-            self.cursor.execute(grab_items_query.format(self.session.get('username')))
-            self.cart = self.cursor.fetchall()
-
-            print(self.cart, type(self.cart), self.cart[0][2])
-
-            
+            cursor.execute(self.queries['grab_items'].format(self.session['username']))
+            self.cart = cursor.fetchall()
         else: # TODO: Handle shopping cart w/o user acct. login
             flash('Please Login')
+
+        connection.close()
+
+
+    #TODO: Implement
+    def add_item(self, pid):
+        pass
+
+
+    #TODO: Implement
+    def update_cart(self):
+        pass

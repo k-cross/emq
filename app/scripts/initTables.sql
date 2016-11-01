@@ -57,6 +57,7 @@ create table transaction_details(
 create table inventory(
 	pID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     pname VARCHAR(256) NOT NULL,
+    price decimal(6,2) NOT NULL,
     image VARCHAR(256) NOT NULL /*stores the path to the image, which is actually stored locally*/,
     description VARCHAR(256) NOT NULL,
     category VARCHAR(256) NOT NULL,
@@ -73,7 +74,6 @@ create table store(
 create table inventory_details(
 	pID int NOT NULL,
     storeID int NOT NULL,
-    price decimal(6,2) NOT NULL,
     stock int NOT NULL,    
     FOREIGN KEY (pID) REFERENCES inventory(pID) on DELETE CASCADE,
     foreign key (storeID) REFERENCES store(storeID) on DELETE CASCADE,

@@ -21,13 +21,13 @@ insert into store (street, zip, city, state) values ('912 Pawling Point', '20414
 insert into store (street, zip, city, state) values ('94097 Bunting Terrace', '93111', 'Santa Barbara', 'CA');
 insert into store (street, zip, city, state) values ('846 Spenser Pass', '33487', 'Boca Raton', 'FL');
 
-insert into inventory (pname, image, description, category, brand) values ('samsung television', 'product_images/samtelevision.jpg', 'It\'s a Samsung tv', 'electronic', 'Samsung');
-insert into inventory (pname, image, description, category, brand) values ('sony television', 'product_images/sonytelevision.jpg', 'It\'s a Sony tv', 'electronic', 'Sony');
+insert into inventory (pname, price, image, description, category, brand) values ('samsung television', 5000.00, 'product_images/samtelevision.jpg', 'It\'s a Samsung tv', 'electronic', 'Samsung');
+insert into inventory (pname, price, image, description, category, brand) values ('sony television', 4400.00, 'product_images/sonytelevision.jpg', 'It\'s a Sony tv', 'electronic', 'Sony');
 
-insert into inventory_details (pId, storeID, price, stock) values (1, 1, 5000.00, 10);
-insert into inventory_details (pId, storeID, price, stock) values (1, 2, 5000.00, 7);
-insert into inventory_details (pId, storeID, price, stock) values (1, 3, 5000.00, 22);
-insert into inventory_details (pId, storeID, price, stock) values (2, 1, 4400.00, 8);
+insert into inventory_details (pId, storeID, stock) values (1, 1, 10);
+insert into inventory_details (pId, storeID, stock) values (1, 2, 7);
+insert into inventory_details (pId, storeID, stock) values (1, 3, 22);
+insert into inventory_details (pId, storeID, stock) values (2, 1, 8);
 
 insert into cart (username, pId, quantity) values ('a', 1, 3);
 insert into cart (username, pId, quantity) values ('a', 2, 2);
