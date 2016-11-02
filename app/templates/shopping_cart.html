@@ -8,17 +8,15 @@
 
 <div class="page-content">
     {% for item in item_forms %}
-    <li>
-        <span class='cart-items'>
-            {{ wtf.quick_form(item) }}
-        </span>
-    </li>
+    <span class='cart-items'>
+        {{ wtf.quick_form(item) }} <!-- TODO: Add Product names here -->
+    </span>
     {% endfor %}
 
-{{ wtf.quick_form(form) }}
-    <span class='cart-total'>
-        <p>{{ total }}</p>
-    </span>
+    <div class='cart-total'>
+        <h3>Total: ${{ total[0] }}</h3>
+        {{ wtf.quick_form(form) }}
+    </div>
 </div>
 {% endblock %}
 

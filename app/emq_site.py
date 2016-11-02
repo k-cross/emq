@@ -188,7 +188,6 @@ def order_confirmation():
     return render_template('order_confirmation.html')
 
 
-#TODO: complete function / currently broken
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     if 'username' in session:
@@ -198,30 +197,18 @@ def checkout():
             return redirect(url_for('shopping_cart'))
 
         if form.validate_on_submit():
-            connection = mysql.connect()
-            cursor = connection.cursor()
-
-            # TODO: Replace with shopping cart function logic
-            cursor.execute(information_query.format(session['username']))
-
             cc = form.credit_card.data
             ct = form.card_type.data
 
             # TODO: Replace with shopping cart function logic
-            cursor.execute(transaction_query.format(
-                session['userid'], 
-                session['total'], 
-                'Pending'))
-            cursor.commit()
-            connection.close()
+            ShoppingCart(mysql, session).checkout()
 
-            return redirect(url_for('shopping_cart'))
-        return render_template('checkout.html', form=form)
+            return redirect(url_for('order_confirmation'))
+        return render_template('checkout.html', form=form, total=session['total'])
     else:
         return redirect(url_for('login'))
 
 
-#TODO: Redirect to checkout when complete
 @app.route('/cart', methods=['GET', 'POST'])
 def shopping_cart():
     if 'username' in session:
@@ -232,7 +219,12 @@ def shopping_cart():
         item_forms = usercart.item_forms
 
         if form.validate_on_submit():
-            return redirect(url_for('shopping_cart'))
+            if form.checkout_btn.data:
+                session['total'] = usercart.calculate_total()[0]
+                return redirect(url_for('checkout'))
+            else:
+                # TODO: Update Cart in DB and local
+                return redirect(url_for('shopping_cart'))
         return render_template('shopping_cart.html', form=form, 
                 total=usercart.calculate_total(), item_forms=item_forms)
     else:

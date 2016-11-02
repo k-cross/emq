@@ -15,20 +15,15 @@ from wtforms.validators import Required, NumberRange
 SHIPPING_RATE = 5.50
 TAX_RATE = 0.095
 
-#TODO: Display separate user not logged in form or redirect to login
-class ShoppingCartFailForm(FlaskForm):
-    pass
-
 
 class CheckoutForm(FlaskForm):
     credit_card = IntegerField("Credit Card", 
             validators=[NumberRange(1000000000000000, 9999999999999999)])
-    card_type = SelectField(u'Type', choices=[(1, 'VISA'), (2, 'MASTERCARD')])
+    card_type = SelectField(u'Type', coerce=int, choices=[(1, 'MASTERCARD'), (2, 'VISA')])
     checkout_btn = SubmitField('Checkout')
 
 
 class ShoppingCartForm(FlaskForm):
-    # TODO: Add checkout button
     update_btn = SubmitField('Update')
     checkout_btn = SubmitField('Checkout')
 
@@ -42,8 +37,10 @@ class ShoppingCart:
         self.queries = {
                 'grab_items' : "SELECT pname, cart.pid, price, quantity FROM cart, "
                     + "inventory WHERE username='{}' and cart.pID=inventory.pID",
+                'add_item' : "INSERT INTO cart (username, pID) VALUES ('{}', '{}')",
                 'transaction_query' : "INSERT INTO transaction (userID, total_price, "
-                    + "status) VALUES ('{}', '{}', '{}')"
+                    + "status) VALUES ('{}', '{}', '{}')",
+                'checkout_query' : "DELETE FROM cart WHERE username='{}'",
                 }
 
         self.mysql = mysql
@@ -83,17 +80,40 @@ class ShoppingCart:
         if 'username' in self.session:
             cursor.execute(self.queries['grab_items'].format(self.session['username']))
             self.cart = cursor.fetchall()
-        else: # TODO: Handle shopping cart w/o user acct. login
+        else:
             flash('Please Login')
 
         connection.close()
 
 
-    #TODO: Implement
     def add_item(self, pid):
-        pass
+        connection = self.mysql.connect()
+        cursor = connection.cursor()
 
+        cursor.execute(self.queries['add_item'].format(self.session['username'], pid))
+
+        connection.commit()
+        connection.close()
 
     #TODO: Implement
     def update_cart(self):
         pass
+
+
+    def checkout(self):
+        connection = self.mysql.connect()
+        cursor = connection.cursor()
+
+        cursor.execute(self.queries['checkout_query'].format(self.session['username']))
+        cursor.execute(self.queries['transaction_query'].format(
+            self.session['userid'],
+            self.session['total'],
+            'Pending',
+        ))
+
+        connection.commit()
+
+        connection.close()
+
+        self.get_items()
+        self.session['usercart'] = self.cart
