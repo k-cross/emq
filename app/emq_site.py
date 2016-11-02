@@ -114,6 +114,7 @@ def checkUser():
             flash("UserName doesn't exist")
             return render_template("login.html")
     conn.close()
+    session['usercart'] = ShoppingCart(mysql, session).cart
     return redirect(url_for('home'))
 
 
@@ -193,6 +194,9 @@ def checkout():
     if 'username' in session:
         form = CheckoutForm()
 
+        if 'usercart' not in session:
+            return redirect(url_for('shopping_cart'))
+
         if form.validate_on_submit():
             connection = mysql.connect()
             cursor = connection.cursor()
@@ -204,8 +208,10 @@ def checkout():
             ct = form.card_type.data
 
             # TODO: Replace with shopping cart function logic
-            cursor.execute(transaction_query.format(session['userid'], 
-                session['total'], 'Pending'))
+            cursor.execute(transaction_query.format(
+                session['userid'], 
+                session['total'], 
+                'Pending'))
             cursor.commit()
             connection.close()
 
@@ -218,14 +224,20 @@ def checkout():
 #TODO: Redirect to checkout when complete
 @app.route('/cart', methods=['GET', 'POST'])
 def shopping_cart():
-    items = None
-    cart = ShoppingCart(mysql, session)
-    form = cart.form
+    if 'username' in session:
+        usercart = ShoppingCart(mysql, session)
+        form = usercart.form
+        session['usercart'] = usercart.cart
 
-    if form.validate_on_submit():
-        print(cart.calculate_total())
-        return redirect(url_for('shopping_cart'))
-    return render_template('shopping_cart.html', form=form)
+        item_forms = usercart.item_forms
+
+        if form.validate_on_submit():
+            return redirect(url_for('shopping_cart'))
+        return render_template('shopping_cart.html', form=form, 
+                total=usercart.calculate_total(), item_forms=item_forms)
+    else:
+        flash('Please Login')
+        return redirect(url_for('login'))
 
 
 @app.route('/products', methods=['GET', 'POST'])
