@@ -23,7 +23,7 @@ class ShoppingCartFailForm(FlaskForm):
 class CheckoutForm(FlaskForm):
     credit_card = IntegerField("Credit Card", 
             validators=[NumberRange(1000000000000000, 9999999999999999)])
-    card_type = SelectField(choices=[(1, 'VISA'), (2, 'MASTERCARD')])
+    card_type = SelectField(u'Type', choices=[(1, 'VISA'), (2, 'MASTERCARD')])
     checkout_btn = SubmitField('Checkout')
 
 
@@ -31,6 +31,10 @@ class ShoppingCartForm(FlaskForm):
     # TODO: Add checkout button
     update_btn = SubmitField('Update')
     checkout_btn = SubmitField('Checkout')
+
+
+class ShoppingCartButtonForm(FlaskForm):
+    update_btn = SelectField(u'Quantity', choices=[(i,i) for i in range(1, 11)])
 
 
 class ShoppingCart:
@@ -49,6 +53,10 @@ class ShoppingCart:
 
         # Do this after the database has been queried for info
         self.form = ShoppingCartForm()
+        self.item_forms = [ShoppingCartButtonForm() for i in range(0, len(self.cart))]
+
+        for i in range(0, len(self.item_forms)):
+            self.item_forms[i].update_btn.id='qty_{}'.format(i)
 
 
     def calculate_total(self):
@@ -66,6 +74,7 @@ class ShoppingCart:
 
         total = subtotal + (subtotal * TAX_RATE) + SHIPPING_RATE
         return total, subtotal, TAX_RATE, SHIPPING_RATE
+
 
     def get_items(self):
         connection = self.mysql.connect()

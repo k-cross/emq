@@ -4,8 +4,22 @@
 {% block page_content %}
 <div class="page-header">
     <h1>Shopping Cart</h1>
-  
+</div>
+
+<div class="page-content">
+    {% for item in item_forms %}
+    <li>
+        <span class='cart-items'>
+            {{ wtf.quick_form(item) }}
+        </span>
+    </li>
+    {% endfor %}
+
 {{ wtf.quick_form(form) }}
+    <span class='cart-total'>
+        <p>{{ total }}</p>
+    </span>
+</div>
 {% endblock %}
 
 <!-- AMAZON REFERENCE ITEM
