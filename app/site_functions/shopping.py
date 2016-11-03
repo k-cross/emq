@@ -29,7 +29,7 @@ class ShoppingCartForm(FlaskForm):
 
 
 class ShoppingCartButtonForm(FlaskForm):
-    update_btn = SelectField(u'Quantity', choices=[(i,i) for i in range(1, 11)])
+    update_btn = SelectField(u'Quantity',choices=[(i,i) for i in range(1, 11)])
 
 
 class ShoppingCart:
@@ -40,6 +40,8 @@ class ShoppingCart:
                 'add_item' : "INSERT INTO cart (username, pID) VALUES ('{}', '{}')",
                 'transaction_query' : "INSERT INTO transaction (userID, total_price, "
                     + "status) VALUES ('{}', '{}', '{}')",
+                'transaction_details_query' : "INSERT INTO intransaction_details(pID,price, "
+                    + "quantity, storeID) VALUES ('{}', '{}', '{}', '{}')",
                 'checkout_query' : "DELETE FROM cart WHERE username='{}'",
                 }
 
@@ -53,7 +55,8 @@ class ShoppingCart:
         self.item_forms = [ShoppingCartButtonForm() for i in range(0, len(self.cart))]
 
         for i in range(0, len(self.item_forms)):
-            self.item_forms[i].update_btn.id='qty_{}'.format(i)
+           self.item_forms[i].update_btn.id='qty_{}'.format(i)
+           self.item_forms[i].update_btn.name= i
 
 
     def calculate_total(self):
@@ -104,13 +107,28 @@ class ShoppingCart:
         connection = self.mysql.connect()
         cursor = connection.cursor()
 
-        cursor.execute(self.queries['checkout_query'].format(self.session['username']))
         cursor.execute(self.queries['transaction_query'].format(
             self.session['userid'],
             self.session['total'],
             'Pending',
         ))
+        transactionID = cursor.lastrowid
 
+        cursor.execute("Select pID, quantity from cart where username='"+self.session['username']+"'")   
+        CartRows = cursor.fetchall()
+        print(CartRows)
+        for cartrow in CartRows:
+            
+            cursor.execute("Select price from inventory where pID= %s",(cartrow[0],))     
+            productRow = cursor.fetchone ()
+            
+            cursor.execute("INSERT INTO transaction_details (transID, pID, price, "
+                    + "quantity, storeID) VALUES (%s,%s,%s,%s,%s)",
+                       (transactionID, cartrow[0], productRow[0], cartrow[1], '1')) 
+
+        
+        cursor.execute(self.queries['checkout_query'].format(self.session['username']))
+       
         connection.commit()
 
         connection.close()

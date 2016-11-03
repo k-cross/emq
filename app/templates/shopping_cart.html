@@ -8,15 +8,39 @@
 
 <div class="page-content">
     {% for item in item_forms %}
+	
     <span class='cart-items'>
-        {{ wtf.quick_form(item) }} <!-- TODO: Add Product names here -->
+	
+		<div id="cart-items-container">
+			<div class="col-md-6 cart-items-label">{{cart[count][0]}} <br> Price:{{cart[count][2]}} X {{ cart[count][3] }}{% set count = count + 1 %} </div>
+			<div class="col-md-6 items-form"> {{ wtf.quick_form(item) }} <!-- TODO: Add Product names here --></div>
+		</div>
     </span>
     {% endfor %}
 
-    <div class='cart-total'>
-        <h3>Total: ${{ total[0] }}</h3>
-        {{ wtf.quick_form(form) }}
+    <div class='cart-total col-md-12'>
+		<table class="table">
+			<tr>
+				<td>Subtotal:</td>
+				<td> ${{ total[1] }}</td>
+			</tr>
+			<tr>
+				<td>Tax:</td>
+				<td> ${{ total[2] }}</td>
+			</tr>
+			<tr>
+				<td>Shipping:</td>
+				<td> ${{ total[3] }}</td>
+			</tr>
+			<tr class="h4">
+				<td>Total:</td>
+				<td> ${{ total[0] }}</td>
+			</tr>
+		</table>
     </div>
+	<div class="col-md-12">
+		{{ wtf.quick_form(form) }}
+	</div>
 </div>
 {% endblock %}
 

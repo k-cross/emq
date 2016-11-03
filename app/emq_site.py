@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 # Our written additions
 from settings import app_setup
-from site_functions.shopping import ShoppingCart, CheckoutForm
+from site_functions.shopping import ShoppingCart, CheckoutForm, ShoppingCartButtonForm
 from site_functions import order
 
 # Initialize Application
@@ -68,12 +68,16 @@ def profile():
                  
             if not cursor is None:
 
-                cursor.execute("Select email,fname,lname,street,zip,city,state from user where username='"+session['username']+"'")
-                    
+                cursor.execute("Select email,fname,lname,street,zip,city,state from user where username='"+session['username']+"'")  
                 row = cursor.fetchone ()
+
+                cursor.execute("Select total_price, trans_time, status from transaction where userid=%s",(session['userid']))
+                orderRows = cursor.fetchall()
                 
             conn.close()
-            return render_template('profile.html',username=session['username'], email=row[0], fname=row[1], lname=row[2], street=row[3], zip=row[4], city=row[5], state=row[6])     
+            return render_template('profile.html',username=session['username'], email=row[0],
+                                   fname=row[1], lname=row[2], street=row[3], zip=row[4],
+                                   city=row[5], state=row[6],orderRows = orderRows)     
 
         else:
             flash("Please login first!")
@@ -171,7 +175,7 @@ def updateUser():
          cursor = conn.cursor()
          #data = cursor.fetchone()
          if not cursor is None:
-            cursor.execute("UPDATE user SET fname=%s,lname=%s,street=%s,zip=%s,city=%s,state=%s",
+            cursor.execute("UPDATE user SET fname=%s,lname=%s,street=%s,zip=%s,city=%s,state=%s WHERE username ='"+session['username']+"'",
                      (Fname,Lname,Street,Zip,City,State))
             flash ("Information Updated")
             conn.commit()
@@ -211,27 +215,43 @@ def checkout():
 
 @app.route('/cart', methods=['GET', 'POST'])
 def shopping_cart():
+
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    
     if 'username' in session:
         usercart = ShoppingCart(mysql, session)
         form = usercart.form
         session['usercart'] = usercart.cart
-
+        cart=session['usercart']
+        
         item_forms = usercart.item_forms
-
         if form.validate_on_submit():
             if form.checkout_btn.data:
                 session['total'] = usercart.calculate_total()[0]
                 return redirect(url_for('checkout'))
             else:
-                # TODO: Update Cart in DB and local
+                # TODO: Implement update 
+##                for i in range(0, len(cart)):
+##                    string = str(i)
+##                    item = item_forms[i].update_btn
+##                    #item = request.args.get(string)
+##                    print(item.data)
+##                    cursor.execute("UPDATE cart SET quantity =%s WHERE pID=%s",
+##                     (item, 1))
+##                    conn.commit()
+##                flash ("Cart Updated")
+##                conn.close()
+                
                 return redirect(url_for('shopping_cart'))
         return render_template('shopping_cart.html', form=form, 
-                total=usercart.calculate_total(), item_forms=item_forms)
+                total=usercart.calculate_total(), item_forms=item_forms, cart=cart, count=0)
     else:
         flash('Please Login')
         return redirect(url_for('login'))
 
-
+# TODO: Implement a dynamic product page
 @app.route('/products', methods=['GET', 'POST'])
 def products():
     return render_template('products.html')
@@ -273,7 +293,40 @@ def trackDelivery():
     except Exception as e:
         print(e)
 
+@app.route('/product/<int:id>')
+def product(id):
+    if 'username' in session:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        print(id)
+        
+        cursor.execute("SELECT * FROM cart WHERE pID = %s AND username = %s",(id,session['username']))
+        row = cursor.fetchone ()
+        
+        if row is None:
+            cursor.execute("INSERT INTO cart (username, pID, quantity) VALUES (%s, %s, %s)",
+                           (session['username'], id, 1))
+            conn.commit()
+            conn.close()
+            flash("New item is added to cart")
+            return redirect(url_for('products'))
 
+        else:
+            cursor.execute("SELECT quantity FROM cart WHERE pID = %s",(id))
+            row = cursor.fetchone ()
+
+            quantity = row[0]
+            quantity = quantity +1
+            
+            cursor.execute("UPDATE cart SET quantity=%s WHERE pID = %s",(quantity, id))
+            conn.commit()
+            conn.close()
+            flash("Seleted is increaed by one")
+            return redirect(url_for('products'))
+    else:
+        flash("Please Login First")
+        return redirect(url_for('products'))
+        
 @app.route('/listUser')
 def list():
     cursor = mysql.connect().cursor()

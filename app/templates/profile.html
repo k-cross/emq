@@ -39,7 +39,7 @@
 				<!-- END SIDEBAR USER TITLE -->
 				<!-- SIDEBAR BUTTONS -->
 				<div class="profile-userbuttons">
-					<button type="button" class="btn btn-success btn-sm" onclick="">
+					<button type="button" class="btn btn-success btn-sm" onclick="location.href='{{ url_for('checkout') }}'">
 						<i class="glyphicon glyphicon-credit-card"></i>
 						CheckOut
 					</button>
@@ -79,8 +79,18 @@
 		<div class="col-md-9">
             <div class="profile-content">
 				
-				<div id="profile-other">
-					Some user related content goes here...
+				<div id="profile-order">
+					<div class='cart-total'>
+						<table class="table">
+							{% for orderrow in orderRows %}
+								<tr>
+									<td>${{orderrow[0]}}</td>
+									<td>{{orderrow[1]}}</td>
+									<td>{{orderrow[2]}}</td>
+								</tr>
+							{% endfor %}
+						</table>
+					</div>
 				</div>
 				
 				<!-- updating only show when account setting button is clicked -->
@@ -146,12 +156,11 @@
 			//});
 			
 			document.getElementById('account_update_btn').onclick = (function(){
-				alert("this is testing");
 				if (document.getElementById('profile-updating').style.display === 'none') {
 					document.getElementById("profile-updating").style.display = "block";
-					document.getElementById("profile-other").style.display = "none";
+					document.getElementById("profile-order").style.display = "none";
 				}else{
-					document.getElementById("profile-other").style.display = "none";
+					document.getElementById("profile-order").style.display = "none";
 					document.getElementById("profile-updating").style.display = "block";
 				}
 				
@@ -163,10 +172,10 @@
 			//	document.getElementById("profile-updating").style.display = "none";
 			//});
 
-			//document.getElementById('order_history_btn').onclick = (function(){
-			//	document.getElementById("profile-other").style.display = "block";
-			///	document.getElementById("profile-updating").style.display = "none";
-			//});
+			document.getElementById('order_history_btn').onclick = (function(){
+				document.getElementById("profile-order").style.display = "block";
+				document.getElementById("profile-updating").style.display = "none";
+			});
 			
 	</script>
 {% endblock %} 

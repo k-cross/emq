@@ -144,3 +144,21 @@ input {
 }
 
 .buttonBlue:hover { background: #357bd8; }
+.cart-items{
+	background:white;
+}
+#cart-items-container{
+	height: 258px;
+    background: white;
+    margin: 20px;
+}
+.cart-items-label{
+	font-size: 20px;
+    font-weight: 900;
+    margin: 60px 0px 0px 0px;
+    padding-left: 120px;
+    line-height: 60px;
+}
+.cart-total{
+	background:white;
+}

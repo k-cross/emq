@@ -47,7 +47,7 @@ create table transaction(
 create table transaction_details(
 	transID int NOT NULL,
     pID int NOT NULL,
-    price decimal(6,2) NOT NULL,
+    price float NOT NULL,
     quantity int NOT NULL,
     storeID int NOT NULL,
     foreign key (transID) REFERENCES transaction(transID) on DELETE CASCADE,
@@ -57,7 +57,7 @@ create table transaction_details(
 create table inventory(
 	pID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     pname VARCHAR(256) NOT NULL,
-    price decimal(6,2) NOT NULL,
+    price float NOT NULL,
     image VARCHAR(256) NOT NULL /*stores the path to the image, which is actually stored locally*/,
     description VARCHAR(256) NOT NULL,
     category VARCHAR(256) NOT NULL,

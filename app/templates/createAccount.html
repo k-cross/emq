@@ -42,7 +42,7 @@
 				</div>
 				
 				<div class="form-group">
-				  <input type="text" name="state" class="form-control " placeholder="State" required>
+				  <input type="text" name="state" class="form-control " placeholder="State" required title="Must Enter Two Characters" pattern="[A-Za-z]{2}">
 				</div>
 				
 				
@@ -57,26 +57,10 @@
 				<br>
 				<!--<button id="sendDataButton" type="button" class="btn pull-right">Create Account</button-->
 				<input type = "submit"  class="button buttonBlue" value = "Create Account" />
-						
+				
 			</form>
 
 		</div><!-- /.col-sm-6 -->
 	    	
-	    	<div id="updatedProfile" class="col-sm-6 col-sm-offset-3">
-          <div class="header"><h2 id='userName'></h2></div>
-	    		  
-	    	
-	    		<div>
-                    <h3 id="userfname"></h3>
-                    <h3 id="userlname"></h3>
-	    			<h3 id="userEmail"></h3>
-	    			<h3 id="userPhone"></h3>
-	    			<h3 id="userPassword"></h3>
-                    <h3 id="userConfirmPassword"></h3>
-
-	    			
-	    		</div><!-- /#updatedProfile -->
-
-	    	</div><!-- /.col-sm-6 -->
        
 {% endblock %}

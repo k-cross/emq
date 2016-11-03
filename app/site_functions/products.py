@@ -14,7 +14,7 @@ class Products(FlaskForm):
         pass
 
 @store_blueprint.route('/product/<int:id>', methods=['GET', 'POST'])
-def product(id=0): 
+def product(id):
     cart = Add_to_cart(prefix="cart")
 
     product = Product.query.get(id)
@@ -30,5 +30,5 @@ def product(id=0):
         else:
             session['cart' .format(id)] = [{product.name: cart.quantity.data}]
 
-
+    
         return redirect(url_for('products.html'))
