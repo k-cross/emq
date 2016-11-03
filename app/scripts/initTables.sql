@@ -86,3 +86,16 @@ create table cart(
 	pID int NOT NULL,
 	quantity int DEFAULT 1
 );
+
+
+create table delivery_info(
+	deliveryID int NOT NULL,
+    deliveryTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    closestStore VARCHAR(256) NOT NULL,
+    deliveryAddress VARCHAR(256) NOT NULL,
+    deliveryEstimateTotalSeconds INT NOT NULL,
+    deliveryDistanceMiles VARCHAR(20) NOT NULL,
+    deliveryDistanceMeters INT NOT NULL,
+    speed FLOAT NOT NULL DEFAULT 1.0
+    FOREIGN KEY (deliveryID) REFERENCES transaction(transID)
+);
