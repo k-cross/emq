@@ -22,7 +22,15 @@ insert into store (street, zip, city, state) values ('94097 Bunting Terrace', '9
 insert into store (street, zip, city, state) values ('846 Spenser Pass', '33487', 'Boca Raton', 'FL');
 
 insert into inventory (pname, price, image, description, category, brand) values ('samsung television', 5000.00, 'product_images/samtelevision.jpg', 'It\'s a Samsung tv', 'electronic', 'Samsung');
-insert into inventory (pname, price, image, description, category, brand) values ('sony television', 4400.00, 'product_images/sonytelevision.jpg', 'It\'s a Sony tv', 'electronic', 'Sony');
+insert into inventory (pname, price, image, description, category, brand) values ('sony television', 4400.00, 'product_images/sonytelevision.jpg', 'It\'s a Sony tv', 'electronic', 'Sony'),
+('HP Spectre x360', 299, '/app/static/laptop.jpg', 'The all-new Spectre x360 was designed for those who crave uninhibited freedom. With alluring power in our thinnest convertible frame.', 'laptop', 'HP'),
+('Pixel', 1100, '/app/static/phone.jpg', 'The power of Google, at your fingertips. Every touch, every interaction, every moment — made easy.', 'phone', 'google'),
+('Roku', 20, '/app/static/rokujpg', 'Roku delivers fast performance and stunning high definition video while being able to stream all your favorite apps at a tremendous value.', 'random', 'rodu'),
+('Bose A20 Headset', 200, '/app/static/headset.png', 'The A20 Aviation Headset is a top of the line headset that is engineered to be more comfortable and provide more noise reduction than any headset.', 'headset', 'bose'),
+('Sandisk Extreme 900 Portable SDD', 100, '/app/static/sdd/jpg', 'The SanDisk Extreme 900 portable SSD delivers up to 9x faster speeds than typical external hard drives.', 'disk', 'sandisk');
+
+
+
 
 insert into inventory_details (pId, storeID, stock) values (1, 1, 10);
 insert into inventory_details (pId, storeID, stock) values (1, 2, 7);
