@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}EMQ - {{product[1]}}{% endblock %}
+
+{% block styles %}
+	{{ super() }}
+	<!-- Super is for flask-bootstrap -->
+	<link href="{{ url_for('static', filename='product-style.css') }}" rel="stylesheet">
+
+{% endblock %}
+
+
+{% block page_content %}
+<div class="product">
+  <div class="header">
+    <div class="back"></div>
+  </div>
+  <div class="main">
+    <div class="left">
+      <h1>{{product[1]}}</h1>
+      <h3>${{product[3]}}</h3>
+      <img src="{{product[2]}}" width = 150 height = 300 alt="" />
+    </div>
+    <div class="right">
+      <p>{{product[4]}}</p>
+      <p>In stock.</p>
+      <div class="product-quantity">
+                <label for="product-quantity-input" class="product-quantity-label">Quantity</label>
+                <div>
+                  <input type="text" id="product-quantity-input" placeholder="0" value="0" />
+                </div>
+              </div>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="left">
+      <p id="price">$960.00</p>
+    </div>
+    <div class="right">
+      <a class="btn btn-success" href="./product/{{product[0]}}">Add to cart</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const arrows = document.querySelector('.quantity').querySelectorAll('.fa');
+
+const handleChange = (elem)=>{
+  const qt = document.querySelector('#qt');
+  const total = document.querySelector('#price');
+  let value = parseInt(qt.innerText);
+  let classArr = Array.from(elem.classList);
+  if(/right/gi.test(classArr)) {
+    if(value!=9) value++;
+    else alert('Watch out! We\'ve got a badass over here!');
+  }
+  else {
+    if(value!=1) value--;
+    else alert('Watch out! We\'ve got a badass over here!');
+  }
+  qt.innerText = value;
+  total.innerText = '$'+(value*320); 
+}
+
+const product = document.querySelector('.product');
+
+const moveBox = (val)=>{
+  product.style.mozTransform =
+  product.style.msTransform =
+  product.style.webkitTransform =
+  product.style.transform = 'translateX('+val+'px)';
+}
+
+const back = document.querySelector('.back');
+
+const spring = new rebound.SpringSystem();
+
+let animation = spring.createSpring(60,3);
+
+animation.addListener({
+  onSpringUpdate(spring){
+    let current = spring.getCurrentValue();
+    if(current > 1) spring.setEndValue(0);
+    let val =  rebound.MathUtil.mapValueInRange(current,0,1,0,20);
+    moveBox(val);
+  }
+})
+
+back.addEventListener('click',()=>{
+  animation.setEndValue(1);
+});
+
+
+const arrArr = Array.from(arrows);
+
+arrArr.forEach(elem=>{
+  elem.addEventListener('click',()=>{
+    handleChange(elem);
+  })
+})
+</script>
+{% endblock %}
+

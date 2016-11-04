@@ -71,7 +71,7 @@ def profile():
                 cursor.execute("Select email,fname,lname,street,zip,city,state from user where username='"+session['username']+"'")  
                 row = cursor.fetchone ()
 
-                cursor.execute("Select total_price, trans_time, status from transaction where userid=%s",(session['userid']))
+                cursor.execute("Select total_price, trans_time, status, transID from transaction where userid=%s",(session['userid']))
                 orderRows = cursor.fetchall()
                 
             conn.close()
@@ -100,7 +100,7 @@ def checkUser():
         cursor.execute("Select password,userID from user where username='"+Username+"'")
             
         row = cursor.fetchone ()
-        
+        print(row)
         if not row is None:
             hashed = row[0]
             print(hashed)
@@ -227,6 +227,7 @@ def shopping_cart():
         cart=session['usercart']
         
         item_forms = usercart.item_forms
+        print(item_forms)
         if form.validate_on_submit():
             if form.checkout_btn.data:
                 session['total'] = usercart.calculate_total()[0]
@@ -254,45 +255,40 @@ def shopping_cart():
 # TODO: Implement a dynamic product page
 @app.route('/products', methods=['GET', 'POST'])
 def products():
-    return render_template('products.html')
+    cursor = mysql.connect().cursor()
+    cursor.execute("select * from inventory") 
+    rows = cursor.fetchall()    
+    return render_template('products.html', products = rows)
 
 
 @app.route('/locations')
 def locations():
-    try:
-        storeLocations = [
-                '30600 Dyer St, Union City, CA 94587', 
-                'West Gate San Leandro, 1919 Davis St, San Leandro, CA 94577', 
-                '40580 Albrae St, Fremont, CA 94538', 
-                '777 Story rd, San Jose', 
-                '301 Ranch Dr, Milpitas, CA 95035', 
-                '600 Showers Dr, Mountain View, CA',
-                '4080 Stevens Creek Blvd, San Jose, CA 95128', 
-                'Woodside Central, 2485 El Camino Real, Redwood City, CA 94063', 
-                'Bridgepointe Shopping Center, 2220 Bridgepointe Pkwy, San Mateo, CA 94404',
-                '1150 El Camino Real, San Bruno, CA 94066',
-                '1830 Ocean Ave, San Francisco, CA 94112',
-                '2675 Geary Blvd, San Francisco, CA 94118',
-                '2700 5th St, Alameda, CA 94501']
-        return render_template('locations.html', key=app.config['google_maps'], storeLocations=storeLocations)
-    except Exception as e:
-        print(e)
+    cursor = mysql.connect().cursor()
+    cursor.execute("select  CONCAT(store.street, ', ', store.city, ', ', store.state, ' ', store.zip) as storeAddress from store") 
+    rows = cursor.fetchall()
+    return render_template('locations.html', key=app.config['google_maps'], storeLocations=rows)
 
 
-@app.route('/trackDelivery')
+@app.route('/trackDelivery/', methods=['GET', 'POST'])
 def trackDelivery():
     try:
-        items1 = ['item1', 'item2', 'item3']
-        orderPlacedTime1 = datetime.strptime('2016-10-25 16:17:00', '%Y-%m-%d %H:%M:%S')
-        deliveryAddress = '1 Washington Square, San Jose, CA'
-        order1 = order.Order(items1, 52, orderPlacedTime1, 
-                *order.getDeliveryInfo(deliveryAddress))
-        #print (order1.getDeliveryStatus())
-        #print (order1.getCurrentLocation())
+        transID = request.form['track']
+        order1 = order.Order(transID)
         return render_template('map.html', key=app.config['google_maps'], order1=order1)
     except Exception as e:
         print(e)
 
+@app.route('/sproduct', methods=['GET', 'POST'])
+def singleproduct():
+    try:
+        pID = request.args.get('id')
+        cursor = mysql.connect().cursor()
+        cursor.execute("select * from inventory where pID =" + str(pID)) 
+        row = cursor.fetchone()   
+        return render_template('singleproduct.html', product = row)
+    except Exception as e:
+        print(e)
+        
 @app.route('/product/<int:id>')
 def product(id):
     if 'username' in session:
@@ -330,7 +326,7 @@ def product(id):
 @app.route('/listUser')
 def list():
     cursor = mysql.connect().cursor()
-    cursor.execute("SELECT * from user")
+    cursor.execute("SELECT * from orders")
     rows = cursor.fetchall(); 
 
     return render_template("list.html",rows = rows)

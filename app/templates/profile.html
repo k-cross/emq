@@ -87,8 +87,12 @@
 									<td>${{orderrow[0]}}</td>
 									<td>{{orderrow[1]}}</td>
 									<td>{{orderrow[2]}}</td>
+                                    <form action="{{ url_for('trackDelivery') }}" method="Post">
+                                        <td> <button type = "submit" name="track"  value = "{{orderrow[3]}}" />Track</button> </td>
+                                    </form>
 								</tr>
 							{% endfor %}
+                            
 						</table>
 					</div>
 				</div>

@@ -9,6 +9,7 @@ from flaskext.mysql import MySQL
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField, SelectField
 from wtforms.validators import Required, NumberRange
+from .order import Order, getDeliveryInfo
 
 
 # GLOBALS
@@ -125,6 +126,21 @@ class ShoppingCart:
             cursor.execute("INSERT INTO transaction_details (transID, pID, price, "
                     + "quantity, storeID) VALUES (%s,%s,%s,%s,%s)",
                        (transactionID, cartrow[0], productRow[0], cartrow[1], '1')) 
+        
+        cursor.execute("insert into orders(userID, transID, totalCost, orderPlacedTime, "
+                + "items, deliveryAddress) SELECT user.userID as userID, t.transID, t.total_price, t.trans_time, "
+                + "CONCAT('[', GROUP_CONCAT(td.pID SEPARATOR ', '), ']'), "
+                + "CONCAT(user.street, ', ', user.city, ', ', user.state, ' ', user.zip) "
+                + "from transaction t, transaction_details td, user "
+                + "where t.transID = %s and t.userId = user.userID "
+                + "GROUP BY user.userID, t.transID;", (transactionID ))  
+        connection.commit()
+        cursor.execute("SELECT * from orders where transID = %s", transactionID )  
+        row = cursor.fetchone()
+        print (row[5])
+        deliverAddress = row[5]
+        stuff = getDeliveryInfo(deliverAddress)
+        cursor.execute("Update orders SET storeAddress = %s, deliveryEstimateSeconds = %s, deliverDistanceMeters = %s, deliverDistanceMiles = %s, speed = %s where transID = %s", (str(stuff[0]), stuff[2], stuff[3], stuff[4], stuff[5], transactionID) ) 
 
         
         cursor.execute(self.queries['checkout_query'].format(self.session['username']))

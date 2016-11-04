@@ -1,25 +1,30 @@
+from flaskext.mysql import MySQL
+from flask import Flask, current_app
+from settings import app_setup
 import googlemaps
 from datetime import datetime
 import pprint
 
-
+app = app_setup()
+mysql = MySQL()
+mysql.init_app(app)
 gmaps = googlemaps.Client(key='AIzaSyB7BkwSe4-5V14C3wY301HVolGN2IdO2PA')
 
 class Order:
 
-    def __init__(self, items, totalCost, orderPlacedTime, storeAddress, 
-            deliveryAddress,  deliveryEstimateTotalSeconds, deliveryDistanceMeters, 
-            deliveryDistanceMiles, speed):
-
-        self.items = items
-        self.totalCost = totalCost
-        self.orderPlacedTime = orderPlacedTime
-        self.deliveryAddress = deliveryAddress
-        self.storeAddress = storeAddress
-        self.deliveryEstimateTotalSeconds = deliveryEstimateTotalSeconds
-        self.deliveryDistanceMeters = deliveryDistanceMeters
-        self.deliveryDistanceMiles = deliveryDistanceMiles
-        self.speed = speed
+    def __init__(self, transID):       
+        cursor = mysql.connect().cursor()
+        cursor.execute("SELECT * from orders where transID =" + str(transID) ) 
+        row = cursor.fetchone()
+        self.items = row[4]
+        self.totalCost = row[2]
+        self.orderPlacedTime = row[3]
+        self.deliveryAddress = row[5]
+        self.storeAddress = row[6]
+        self.deliveryEstimateTotalSeconds = row[7]
+        self.deliveryDistanceMeters = row[8]
+        self.deliveryDistanceMiles = row[9]
+        self.speed = row[10]
     
     
     def getTimeUntilDelivered(self):
@@ -46,6 +51,7 @@ class Order:
     
     def getCurrentLocation(self):
         timeUntilDelivered = self.getTimeUntilDelivered()
+        print (timeUntilDelivered)
         if timeUntilDelivered == 0:
             return self.deliveryDistanceMeters
         elif timeUntilDelivered < 0:
@@ -56,9 +62,11 @@ class Order:
 
 def getClosestStore(address):
     closestStore = ('store', None)
-    listOfStores = ['777 Story Rd, San Jose, CA',]#, '1107 S King Rd, San Jose, CA', 'walmart mountain view, CA', 'safeway shoreline blvd mountain view, CA']
+    cursor = mysql.connect().cursor()
+    cursor.execute("select  CONCAT('\\'', store.street, ', ', store.city, ', ', store.state, '\\'') from store") 
+    listOfStores = cursor.fetchall()#, '1107 S King Rd, San Jose, CA', 'walmart mountain view, CA', 'safeway shoreline blvd mountain view, CA']
     for store in listOfStores:
-        distanceMatrix = gmaps.distance_matrix(store, address, mode='driving', departure_time=datetime.now(), units='imperial')
+        distanceMatrix = gmaps.distance_matrix(str(store[0]), address, mode='driving', departure_time=datetime.now(), units='imperial')
         tempDistance = distanceMatrix['rows'][0]['elements'][0]['distance']['value']
         #print store        
         #print distanceMatrix['rows'][0]['elements'][0]['distance']['text']
@@ -70,17 +78,17 @@ def getClosestStore(address):
             closestStore = (store, tempDistance)
         else:
             pass
-
     return closestStore
 
 
 def getDeliveryInfo(deliveryAddress):
     try:
         #distanceMatrix = gmaps.distance_matrix(self.storeAddress, self.deliveryAddress, mode='driving', departure_time=datetime.now(), units='imperial')
-        #deliveryEstimateSeconds = distanceMatrix['rows'][0]['elements'][0]['duration_in_traffic']['value']
-        closestStore = getClosestStore(deliveryAddress)[0]
-        directions = gmaps.directions( closestStore , deliveryAddress, mode='driving', departure_time=datetime.now(), units='imperial')
-
+        #deliveryEstimateSeconds = distanceMatrix['rows'][0]['elements'][0]['duration_in_traffic']['value']     
+        closestStore = getClosestStore(deliveryAddress)
+        print ("CLOSEST " + str(closestStore))
+        directions = gmaps.directions( str(closestStore) , deliveryAddress, mode='driving', departure_time=datetime.now(), units='imperial')
+        
         deliveryEstimateTotalSeconds = directions[0]['legs'][0]['duration_in_traffic']['value']
         deliveryDistanceMeters = directions[0]['legs'][0]['distance']['value']
         deliveryDistanceMiles = directions[0]['legs'][0]['distance']['text']

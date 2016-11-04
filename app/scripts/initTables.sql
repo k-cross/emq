@@ -1,4 +1,5 @@
 drop table if exists 	
+	orders,
     cart,
     payment, 
     user,  
@@ -7,6 +8,7 @@ drop table if exists
     inventory_details,
     inventory, 
     store;
+drop view if exists orders_test;
     
 
 create table user(
@@ -39,15 +41,18 @@ create table payment(
 create table transaction(
 	transID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     userID int NOT NULL,
-    total_price decimal(6,2), /*not sure about this just yet. could probably just call a sum query on transaction_details whenever we need the total*/
+    total_price decimal(9,2), /*not sure about this just yet. could probably just call a sum query on transaction_details whenever we need the total*/
     trans_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deliveryDistanceEstimateTotalSeconds int,
+    deliveryDistanceMeters int,
+    deliveryDistanceMiles int,
     status enum('Pending', 'Out for delivery', 'Complete') DEFAULT 'Pending'
 );
 
 create table transaction_details(
 	transID int NOT NULL,
     pID int NOT NULL,
-    price float NOT NULL,
+    price decimal(9,2) NOT NULL,
     quantity int NOT NULL,
     storeID int NOT NULL,
     foreign key (transID) REFERENCES transaction(transID) on DELETE CASCADE,
@@ -57,8 +62,8 @@ create table transaction_details(
 create table inventory(
 	pID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     pname VARCHAR(256) NOT NULL,
-    price float NOT NULL,
     image VARCHAR(256) NOT NULL /*stores the path to the image, which is actually stored locally*/,
+    price decimal(6,2) NOT NULL,
     description VARCHAR(256) NOT NULL,
     category VARCHAR(256) NOT NULL,
     brand VARCHAR(256) NOT NULL
@@ -74,28 +79,41 @@ create table store(
 create table inventory_details(
 	pID int NOT NULL,
     storeID int NOT NULL,
-    stock int NOT NULL,    
+    stock int NOT NULL DEFAULT 9999,    
     FOREIGN KEY (pID) REFERENCES inventory(pID) on DELETE CASCADE,
     foreign key (storeID) REFERENCES store(storeID) on DELETE CASCADE,
     constraint id_ID primary key (pID, storeID)
 );
 
-/* Make un a fk with users */
 create table cart(
-    username varchar(50) NOT NULL,
+	username VARCHAR(50) NOT NULL,
 	pID int NOT NULL,
 	quantity int DEFAULT 1
 );
 
-
-create table delivery_info(
-	deliveryID int NOT NULL,
-    deliveryTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    closestStore VARCHAR(256) NOT NULL,
+create table orders(
+	userID int NOT NULL,
+    transID int NOT NULL primary key,
+    totalCost double NOT NULL,
+    orderPlacedTime DATETIME NOT NULL,
+    items VARCHAR(256) NOT NULL,    
     deliveryAddress VARCHAR(256) NOT NULL,
-    deliveryEstimateTotalSeconds INT NOT NULL,
-    deliveryDistanceMiles VARCHAR(20) NOT NULL,
-    deliveryDistanceMeters INT NOT NULL,
-    speed FLOAT NOT NULL DEFAULT 1.0
-    FOREIGN KEY (deliveryID) REFERENCES transaction(transID)
+    storeAddress VARCHAR(256),
+    deliveryEstimateSeconds int, 
+    deliverDistanceMeters float, 
+    deliverDistanceMiles VARCHAR(256), 
+    speed double
 );
+
+/*this view just collects a bunch of data useful for orders.*/
+create view orders_test as SELECT user.userID as userID, t.transID as transID, t.total_price as totalCost, t.trans_time as orderPlacedTime, 
+									CONCAT('[', GROUP_CONCAT(td.pID SEPARATOR ', '), ']') as items, 
+                                    CONCAT(user.street, ', ', user.city, ', ', user.state, ' ', user.zip) as deliverAddress
+								from transaction t,
+									transaction_details td,
+                                    store,
+                                    user
+								where t.transID = td.transID and
+									td.storeId = store.storeID and
+                                    t.userId = user.userId
+								GROUP BY user.userID, t.transID;

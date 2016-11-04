@@ -5,135 +5,35 @@
 {% block page_content %}
 <div class="page-header">
     
+<!-- Add to cart button should not be there if there is no stock -->
 <div class="container">
-    <h1 align = 'center'>Choose from our Wonderful Selection of Products </h1>
+    <h1 align = 'center'>Welcome to EMQ Products Page! </h1>
     
     <div id="products" class="row list-group">
+    {% for product in products %}
         <div class="item  col-xs-4 col-lg-4">
             <div class="thumbnail">
                 <!-- Not Final Logo, just temporary -->
-                <img src="http://core0.staticworld.net/images/article/2015/02/hp-spectre-x360_beauty-100570598-orig.jpg" width = 150 height = 300/> 
-                <div class="caption">
-                    <h4 class="group inner list-group-item-heading">
-                        HP Spectre x360</h4>
-                    <p class="group inner list-group-item-text">The all-new Spectre x360 was designed for those who crave uninhibited freedom. With alluring power in our thinnest convertible frame.
+                <img src="{{product[2]}}"  width = 150 height = 300/> 
+                <div class="caption"><a class="group inner list-group-item-heading" href="/sproduct?id={{product[0]}}">
+                    <h4 >
+                        {{product[1]}}</h4></a>
+                    <p class="group inner list-group-item-text">{{product[4]}}
                         </p>
                     <div class="row">
                         <div class="col-xs-12 col-md-6">
                             <p class="lead">
-                                $299</p>
+                                {{product[3]}}</p>
                         </div>
                         <div class="col-xs-12 col-md-6">
-                            <a class="btn btn-success" href="./product/3">Add to cart</a>
+                            <a class="btn btn-success" href="./product/{{product[0]}}">Add to cart</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-               <div class="item  col-xs-4 col-lg-4">
-            <div class="thumbnail">
-                <!-- Not Final Logo, just temporary -->
-                <img src="http://i.imgur.com/fL32mJ5.jpg?1" width = 100 height = 150/> 
-                <div class="caption">
-                    <h4 class="group inner list-group-item-heading">
-                        Samsung 40" LED 4K TV</h4>
-                    <p class="group inner list-group-item-text">Watch TV or play games in stunning detail on this Samsung 6-Series 4K UHD TV. Four times the sharpness of Full HD TVs, and upscaling picture quality.
-                        </p>
-                    <div class="row">
-                        <div class="col-xs-12 col-md-6">
-                            <p class="lead">
-                                $299</p>
-                        </div>
-                        <div class="col-xs-12 col-md-6">
-                            <a class="btn btn-success" href="./product/1">Add to cart</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
- <div class="item  col-xs-4 col-lg-4">
-            <div class="thumbnail">
-                <!-- Not Final Logo, just temporary -->
-                <img src="https://i1.wp.com/hypebeast.com/image/2016/10/google-pixel-phone-leaked-photos-01.jpg?quality=95&w=1024" width = 200 height = 250/> 
-                <div class="caption">
-                    <h4 class="group inner list-group-item-heading">
-                        Pixel</h4>
-                    <p class="group inner list-group-item-text">The power of Google, at your fingertips. Every touch, every interaction, every moment — made easy.
-                        </p>
-                    <div class="row">
-                        <div class="col-xs-12 col-md-6">
-                            <p class="lead">
-                                $100</p>
-                        </div>
-                        <div class="col-xs-12 col-md-6">
-                            <a class="btn btn-success" href="./product/4">Add to cart</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
- <div class="item  col-xs-4 col-lg-4">
-            <div class="thumbnail">
-                <!-- Not Final Logo, just temporary -->
-                <img src="https://images-na.ssl-images-amazon.com/images/I/51joAVOcKBL._SL1000_.jpg" width = 200 height = 250/> 
-                <div class="caption">
-                    <h4 class="group inner list-group-item-heading">
-                        Sandisk Extreme 900 Portable SDD</h4>
-                    <p class="group inner list-group-item-text">The SanDisk Extreme 900 portable SSD delivers up to 9x faster speeds than typical external hard drives.
-                        </p>
-                    <div class="row">
-                        <div class="col-xs-12 col-md-6">
-                            <p class="lead">
-                                $100</p>
-                        </div>
-                        <div class="col-xs-12 col-md-6">
-                            <a class="btn btn-success" href="./product/7">Add to cart</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
- <div class="item  col-xs-4 col-lg-4">
-            <div class="thumbnail">
-                <!-- Not Final Logo, just temporary -->
-                <img src="http://www.pilotshop.com/catalog/graphics/b/bosea20.png" width = 150 height = 250/> 
-                <div class="caption">
-                    <h4 class="group inner list-group-item-heading">
-                        BOSE A20 Headset</h4>
-                    <p class="group inner list-group-item-text">The A20 Aviation Headset is a top of the line headset that is engineered to be more comfortable and provide more noise reduction than any headset.
-                        </p>
-                    <div class="row">
-                        <div class="col-xs-12 col-md-6">
-                            <p class="lead">
-                                $200</p>
-                        </div>
-                        <div class="col-xs-12 col-md-6">
-                            <a class="btn btn-success" href="./product/6">Add to cart</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-         <div class="item  col-xs-4 col-lg-4">
-            <div class="thumbnail">
-                <!-- Not Final Logo, just temporary -->
-                <img src="https://images-na.ssl-images-amazon.com/images/I/51BXju3LMpL._SL1000_.jpg" width = 200 height = 250/> 
-                <div class="caption">
-                    <h4 class="group inner list-group-item-heading">
-                        Roku</h4>
-                    <p class="group inner list-group-item-text">Roku delivers fast performance and stunning high definition video while being able to stream all your favorite apps at a tremendous value.
-                        </p>
-                    <div class="row">
-                        <div class="col-xs-12 col-md-6">
-                            <p class="lead">
-                                $20</p>
-                        </div>
-                        <div class="col-xs-12 col-md-6">
-                            <a class="btn btn-success" href="./product/5">Add to cart</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    {% endfor %}
+    </div>      
+
 
 {% endblock %}
