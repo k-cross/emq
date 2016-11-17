@@ -2,9 +2,10 @@ from flask import Flask, render_template, request, redirect, jsonify, flash, url
 from flask import flash, session
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, IntegerField
+from flask_wtf import FlaskForm, Form
+from wtforms import StringField, SubmitField, IntegerField, TextField, TextAreaField
 from wtforms.validators import Required, NumberRange
+from wtforms import validators, ValidationError
 from flaskext.mysql import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -12,6 +13,7 @@ from datetime import datetime
 from settings import app_setup
 from site_functions.shopping import ShoppingCart, CheckoutForm, ShoppingCartButtonForm
 from site_functions import order
+
 
 # Initialize Application
 app = app_setup()
@@ -27,6 +29,35 @@ def home():
         return render_template('home.html')
     except Exception as e:
         print(e)
+
+@app.route('/contact', methods = ['GET', 'POST'])
+def contact():
+            #Fname = request.form['userfname']
+            #Lname = request.form['userlname']
+            #Email = request.form['userEmail']
+            #Phone = request.form['userPhone']
+            #message = request.form['userMessage']
+    class ContactF(Form):
+        fname = TextField('First Name', [validators.Required("Enter your first name")])
+        lname = TextField('Last Name', [validators.Required("Enter your last name")])
+        email = TextField('Email', [validators.Required("Enter your e-mail")])
+        phone = TextField('Phone Number', [validators.Required("Enter your phone number")])
+        message = TextAreaField('Message', [validators.Required("Enter your question")])
+        submit = SubmitField("Submit")
+
+    forms = ContactF()
+    if request.method == 'POST':
+        if forms.validate() == False:
+            flash("Fill required fields.")
+            return render_template('contact.html', forms = forms)
+        else:
+            flash("Sent!")
+            return render_template('home.html', success =  True)
+
+    elif request.method == 'GET':
+        return render_template('contact.html', forms = forms)
+
+ 
 
 
 @app.route('/createAccount')
