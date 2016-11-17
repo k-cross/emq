@@ -40,12 +40,12 @@ class ShoppingCart:
                     + "inventory WHERE username='{}' and cart.pID=inventory.pID",
                 'grab_orders' : "SELECT * FROM orders WHERE transID = {}",
                 'add_item' : "INSERT INTO cart (username, pID) VALUES ('{}', '{}')",
+                'checkout_query' : "DELETE FROM cart WHERE username='{}'",
                 'transaction_insert' : "INSERT INTO transaction (userID, total_price, "
                     + "status) VALUES ('{}', '{}', '{}')",
                 'transaction_details_insert' : "INSERT INTO transaction_details("
                     + "transID,pID,price,quantity,storeID) VALUES ("
                     + "'{}', '{}', '{}', '{}', '{}')",
-                'checkout_query' : "DELETE FROM cart WHERE username='{}'",
                 'order_update' : "UPDATE orders SET storeAddress = {}, "
                     + "deliveryEstimateSeconds = {}, deliverDistanceMeters = {}, "
                     + "deliverDistanceMiles = {}, speed = {} WHERE transID = {}",
