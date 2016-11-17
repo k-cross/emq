@@ -18,7 +18,7 @@ create table user(
     email varchar(50) NOT NULL UNIQUE, 
     fname varchar(50) NOT NULL, 
     lname varchar(50) NOT NULL, 
-    street varchar(256) NOT NULL, 
+    street varchar(256) NOT NULL,
     zip int(5) NOT NULL, 
     city varchar(50) NOT NULL, 
     state char(2) NOT NULL,
@@ -42,14 +42,14 @@ create table transaction_details(
     price decimal(9,2) NOT NULL,
     quantity int NOT NULL,
     storeID int NOT NULL,
-    FOREIGN KEY (transID) REFERENCES transaction(transID) on DELETE CASCADE,
-    constraint td_ID primary key(transID, pID, storeID)
+    FOREIGN KEY (transID) REFERENCES transaction(transID) ON DELETE CASCADE,
+    CONSTRAINT td_ID PRIMARY KEY (transID, pID, storeID)
 );
 
 create table inventory(
 	pID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     pname VARCHAR(256) NOT NULL,
-    image VARCHAR(256) NOT NULL, /* stores the path to the image, which is actually stored locally */
+    image VARCHAR(256) NOT NULL,
     price decimal(6,2) NOT NULL,
     description VARCHAR(256) NOT NULL,
     category VARCHAR(256) NOT NULL,
