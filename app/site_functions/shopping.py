@@ -38,16 +38,30 @@ class ShoppingCart:
         self.queries = {
                 'grab_items' : "SELECT pname, cart.pid, price, quantity FROM cart, "
                     + "inventory WHERE username='{}' and cart.pID=inventory.pID",
+                'grab_orders' : "SELECT * FROM orders WHERE transID = {}",
                 'add_item' : "INSERT INTO cart (username, pID) VALUES ('{}', '{}')",
-                'transaction_query' : "INSERT INTO transaction (userID, total_price, "
+                'transaction_insert' : "INSERT INTO transaction (userID, total_price, "
                     + "status) VALUES ('{}', '{}', '{}')",
-                'transaction_details_query' : "INSERT INTO intransaction_details(pID,price, "
-                    + "quantity, storeID) VALUES ('{}', '{}', '{}', '{}')",
+                'transaction_details_insert' : "INSERT INTO transaction_details("
+                    + "transID,pID,price,quantity,storeID) VALUES ("
+                    + "'{}', '{}', '{}', '{}', '{}')",
                 'checkout_query' : "DELETE FROM cart WHERE username='{}'",
-                }
+                'order_update' : "UPDATE orders SET storeAddress = {}, "
+                    + "deliveryEstimateSeconds = {}, deliverDistanceMeters = {}, "
+                    + "deliverDistanceMiles = {}, speed = {} WHERE transID = {}",
+                'order_insert' : "INSERT INTO orders(userID, transID, totalCost," 
+                        + "orderPlacedTime, items, deliveryAddress) SELECT user.userID "
+                        + "AS userID, t.transID, t.total_price, t.trans_time, "
+                        + "CONCAT('[', GROUP_CONCAT(td.pID SEPARATOR ', '), ']'), "
+                        + "CONCAT(user.street, ', ', user.city, ', ', user.state, ' ',"
+                        + "user.zip) FROM transaction t, transaction_details td, user "
+                        + "WHERE t.transID = {} and t.userId = user.userID "
+                        + "GROUP BY user.userID, t.transID;",
+                        }
 
         self.mysql = mysql
         self.session = session
+        # self.cart contains (product name, pID, price, quantity)
         self.cart = None
         self.get_items()
 
@@ -74,7 +88,11 @@ class ShoppingCart:
             subtotal += float(self.cart[i][2]) * self.cart[i][3]
 
         total = subtotal + (subtotal * TAX_RATE) + SHIPPING_RATE
-        return total, subtotal, TAX_RATE, SHIPPING_RATE
+
+        if subtotal > 0:
+            return total, subtotal, TAX_RATE, SHIPPING_RATE
+
+        return total, subtotal, TAX_RATE, 0
 
 
     def get_items(self):
@@ -108,45 +126,39 @@ class ShoppingCart:
         connection = self.mysql.connect()
         cursor = connection.cursor()
 
-        cursor.execute(self.queries['transaction_query'].format(
+        cursor.execute(self.queries['transaction_insert'].format(
             self.session['userid'],
             self.session['total'],
             'Pending',
         ))
         transactionID = cursor.lastrowid
 
-        cursor.execute("Select pID, quantity from cart where username='"+self.session['username']+"'")   
-        CartRows = cursor.fetchall()
-        print(CartRows)
-        for cartrow in CartRows:
-            
-            cursor.execute("Select price from inventory where pID= %s",(cartrow[0],))     
+        # self.cart contains (product name, pID, price, quantity)
+        for cartrow in self.cart:
+            cursor.execute("SELECT price FROM inventory WHERE pID= %s",(cartrow[1],))
             productRow = cursor.fetchone ()
             
-            cursor.execute("INSERT INTO transaction_details (transID, pID, price, "
-                    + "quantity, storeID) VALUES (%s,%s,%s,%s,%s)",
-                       (transactionID, cartrow[0], productRow[0], cartrow[1], '1')) 
+            cursor.execute(self.queries['transaction_details_insert'].format(
+                transactionID, cartrow[1], productRow[0], cartrow[3], '1'))
         
-        cursor.execute("insert into orders(userID, transID, totalCost, orderPlacedTime, "
-                + "items, deliveryAddress) SELECT user.userID as userID, t.transID, t.total_price, t.trans_time, "
-                + "CONCAT('[', GROUP_CONCAT(td.pID SEPARATOR ', '), ']'), "
-                + "CONCAT(user.street, ', ', user.city, ', ', user.state, ' ', user.zip) "
-                + "from transaction t, transaction_details td, user "
-                + "where t.transID = %s and t.userId = user.userID "
-                + "GROUP BY user.userID, t.transID;", (transactionID ))  
+        cursor.execute(queries['order_insert'].format(transactionID))
         connection.commit()
-        cursor.execute("SELECT * from orders where transID = %s", transactionID )  
+        cursor.execute(queries['grab_orders'].format(transactionID))
         row = cursor.fetchone()
-        print (row[5])
         deliverAddress = row[5]
         stuff = getDeliveryInfo(deliverAddress)
-        cursor.execute("Update orders SET storeAddress = %s, deliveryEstimateSeconds = %s, deliverDistanceMeters = %s, deliverDistanceMiles = %s, speed = %s where transID = %s", (str(stuff[0]), stuff[2], stuff[3], stuff[4], stuff[5], transactionID) ) 
 
-        
+        cursor.execute(self.queries['order_update'].format(
+            stuff[0],
+            stuff[1],
+            stuff[2],
+            stuff[3],
+            stuff[4],
+            stuff[5],
+            transactionID))
         cursor.execute(self.queries['checkout_query'].format(self.session['username']))
        
         connection.commit()
-
         connection.close()
 
         self.get_items()

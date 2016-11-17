@@ -252,6 +252,7 @@ def shopping_cart():
         flash('Please Login')
         return redirect(url_for('login'))
 
+
 # TODO: Implement a dynamic product page
 @app.route('/products', methods=['GET', 'POST'])
 def products():
@@ -278,6 +279,7 @@ def trackDelivery():
     except Exception as e:
         print(e)
 
+
 @app.route('/sproduct', methods=['GET', 'POST'])
 def singleproduct():
     try:
@@ -289,6 +291,7 @@ def singleproduct():
     except Exception as e:
         print(e)
         
+
 @app.route('/product/<int:id>')
 def product(id):
     if 'username' in session:
@@ -296,7 +299,8 @@ def product(id):
         cursor = conn.cursor()
         print(id)
         
-        cursor.execute("SELECT * FROM cart WHERE pID = %s AND username = %s",(id,session['username']))
+        cursor.execute("SELECT * FROM cart WHERE pID = %s AND username = %s",
+                (id,session['username']))
         row = cursor.fetchone ()
         
         if row is None:
@@ -323,6 +327,7 @@ def product(id):
         flash("Please Login First")
         return redirect(url_for('products'))
         
+
 @app.route('/listUser')
 def list():
     cursor = mysql.connect().cursor()

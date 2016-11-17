@@ -13,10 +13,10 @@ class ShoppingCartUnitTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_shopping_cart_for_problems(self):
+    def test_site_for_issues(self):
         pass
 
-    def test_site_for_issues(self):
+    def test_shopping_cart_for_problems(self):
         pass
 
     def test_shopping_cart_gathers_user_information(self):
