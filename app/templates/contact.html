@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}EMQ - Home{% endblock %}
+
+{% block page_content %}
+<!DOCTYPE html>
+<body>
+       <h1>EMQ Contact</h1>
+        <p class="lead">Have any questions or want more information regarding our products?</p>
+        
+        <p align = 'center'>Fill in the information below.</p> 
+      {% for message in forms.fname.errors %}
+         <div>{{ message }}</div>
+      {% endfor %}
+    
+      {% for message in forms.lname.errors %}
+         <div>{{ message }}</div>
+      {% endfor %}
+      
+      {% for message in forms.phone.errors %}
+         <div>{{ message }}</div>
+      {% endfor %}
+      {% for message in forms.email.errors %}
+         <div>{{ message }}</div>
+      {% endfor %}
+      
+      {% for message in forms.message.errors %}
+         <div>{{ message }}</div>
+      {% endfor %}
+      
+      <form action = "http://localhost:5000/contact" method = post>
+         <fieldset>
+            {{ forms.hidden_tag() }}
+            
+            <div style = font-size:20px; font-weight:bold; margin-left:150px;>
+               {{ forms.fname.label }}<br>
+               {{ forms.fname }}
+               <br>
+               
+               {{ forms.lname.label }}<br>
+               {{ forms.lname }}
+               <br>
+                
+               {{ forms.phone.label }}<br>
+               {{ forms.phone }}
+               <br>
+               
+               {{ forms.email.label }}<br>
+               {{ forms.email }}
+               <br>
+               
+               {{ forms.message.label }}<br>
+               {{ forms.message }}
+               <br>
+               {{ forms.submit }}
+            </div>
+            
+         </fieldset>
+      </form>
+      
+   </body>
+</html>
+{% endblock %}
