@@ -87,12 +87,13 @@ class ShoppingCart:
         for i in range(0, len(self.cart)):
             subtotal += float(self.cart[i][2]) * self.cart[i][3]
 
-        total = subtotal + (subtotal * TAX_RATE) + SHIPPING_RATE
+        tax = subtotal * TAX_RATE
+        total = subtotal + tax + SHIPPING_RATE
 
-        if subtotal > 0:
-            return total, subtotal, TAX_RATE, SHIPPING_RATE
+        if subtotal > 0.0:
+            return total, subtotal, tax, SHIPPING_RATE
 
-        return total, subtotal, TAX_RATE, 0
+        return 0.0, subtotal, 0.0, 0.0
 
 
     def get_items(self):
@@ -132,6 +133,7 @@ class ShoppingCart:
             'Pending',
         ))
         transactionID = cursor.lastrowid
+        print(transactionID)
 
         # self.cart contains (product name, pID, price, quantity)
         for cartrow in self.cart:
@@ -141,9 +143,9 @@ class ShoppingCart:
             cursor.execute(self.queries['transaction_details_insert'].format(
                 transactionID, cartrow[1], productRow[0], cartrow[3], '1'))
         
-        cursor.execute(queries['order_insert'].format(transactionID))
+        cursor.execute(self.queries['order_insert'].format(transactionID))
         connection.commit()
-        cursor.execute(queries['grab_orders'].format(transactionID))
+        cursor.execute(self.queries['grab_orders'].format(transactionID))
         row = cursor.fetchone()
         deliverAddress = row[5]
         stuff = getDeliveryInfo(deliverAddress)

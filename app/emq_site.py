@@ -131,17 +131,14 @@ def checkUser():
         cursor.execute("Select password,userID from user where username='"+Username+"'")
             
         row = cursor.fetchone ()
-        print(row)
         if not row is None:
             hashed = row[0]
-            print(hashed)
             matches = check_password_hash(hashed, Password)
 
             if matches:
                 flash("Hello, "+Username+"! Welcome!!")
                 session['username'] = Username
                 session['userid'] = row[1]
-                print(session['username'],session['userid'])
             else:
                 flash("Username or Password is wrong")
                 return render_template("login.html")
@@ -200,7 +197,6 @@ def updateUser():
          Zip = int(request.form['zip'])
          City = request.form['city']
          State = request.form['state']
-         print(Fname,Lname,Street,Zip,City,State)
            
          conn = mysql.connect()
          cursor = conn.cursor()
@@ -258,7 +254,6 @@ def shopping_cart():
         cart=session['usercart']
         
         item_forms = usercart.item_forms
-        print(item_forms)
         if form.validate_on_submit():
             if form.checkout_btn.data:
                 session['total'] = usercart.calculate_total()[0]
@@ -277,8 +272,10 @@ def shopping_cart():
 ##                conn.close()
                 
                 return redirect(url_for('shopping_cart'))
+
         return render_template('shopping_cart.html', form=form, 
-                total=usercart.calculate_total(), item_forms=item_forms, cart=cart, count=0)
+                total=usercart.calculate_total(), item_forms=item_forms, 
+                cart=cart, count=0)
     else:
         flash('Please Login')
         return redirect(url_for('login'))
@@ -328,7 +325,6 @@ def product(id):
     if 'username' in session:
         conn = mysql.connect()
         cursor = conn.cursor()
-        print(id)
         
         cursor.execute("SELECT * FROM cart WHERE pID = %s AND username = %s",
                 (id,session['username']))
