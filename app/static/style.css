@@ -162,3 +162,41 @@ input {
 .cart-total{
 	background:white;
 }
+
+/* Home Page Background */
+
+.custom_home{
+    background: url("background.jpg");
+
+}
+
+.custom_title {
+  font-size:100px;
+  color: rgb(255, 255, 255); 
+  margin-top:150px;
+  
+}
+
+.custom_quote {
+  font-family: serif;
+  font-style:italic;
+  color: rgb(255, 255, 255);
+  font-size:28px;
+}
+
+.custom_row_quote{
+  margin-top:0px;
+  margin-bottom: -5px;
+}
+
+.custom_TopPhotoAttribute{
+  color:rgb(255,255,255);
+  margin-left:2px;
+  margin-top: 290px;
+}
+
+.row-shopnow{
+  margin-top:50px;
+  //margin-bottom: 20px;  
+}
+
