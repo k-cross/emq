@@ -1,0 +1,8 @@
+FROM debian:wheezy
+
+RUN apt-get install -y python3 mariadb-client mariadb-server
+RUN pip install Flask==0.11.1
+WORKDIR ../app
+COPY app /app
+
+CMD ["python", "emq_site.py"]

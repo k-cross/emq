@@ -1,7 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import SubmitField
-from flask import Blueprint, render_template, abort, session, flash, redirect, url_for
+from flask import render_template, abort, session, flash, redirect, url_for
 
 
 class Products(FlaskForm):

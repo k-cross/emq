@@ -1,5 +1,4 @@
 drop table if exists 	
-	orders,
     cart,
     payment, 
     user,  
@@ -7,41 +6,29 @@ drop table if exists
     transaction,
     inventory_details,
     inventory, 
+	orders,
     store;
+
 drop view if exists orders_test;
     
-
 create table user(
-	userID int NOT NULL AUTO_INCREMENT, 
+	userID int NOT NULL AUTO_INCREMENT,
     username varchar(50) NOT NULL UNIQUE,
     password varchar(256) NOT NULL,	
     email varchar(50) NOT NULL UNIQUE, 
     fname varchar(50) NOT NULL, 
     lname varchar(50) NOT NULL, 
-    street varchar(256) NOT NULL, 
+    street varchar(256) NOT NULL,
     zip int(5) NOT NULL, 
     city varchar(50) NOT NULL, 
     state char(2) NOT NULL,
-    constraint u_ID primary key(userID)
+    CONSTRAINT u_ID PRIMARY KEY (userID)
 );
-
-/*might not even need this table if we have users enter this info on checkout*/    
-/*
-create table payment(
-	userID int NOT NULL, 
-    card_number varchar(16) NOT NULL, 
-    card_type enum('VISA', 'Mastercard', 'American Express', 'Discover') NOT NULL default 'VISA', 
-    pin int(4) NOT NULL, 
-    cvv int(3) NOT NULL,
-    FOREIGN KEY (userID) REFERENCES USER(userID) on DELETE CASCADE,
-    constraint p_ID primary key(userID, card_number)
-);
-*/
 
 create table transaction(
 	transID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     userID int NOT NULL,
-    total_price decimal(9,2), /*not sure about this just yet. could probably just call a sum query on transaction_details whenever we need the total*/
+    total_price decimal(9,2),
     trans_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deliveryDistanceEstimateTotalSeconds int,
     deliveryDistanceMeters int,
@@ -55,14 +42,14 @@ create table transaction_details(
     price decimal(9,2) NOT NULL,
     quantity int NOT NULL,
     storeID int NOT NULL,
-    foreign key (transID) REFERENCES transaction(transID) on DELETE CASCADE,
-    constraint td_ID primary key(transID, pID, storeID)
+    FOREIGN KEY (transID) REFERENCES transaction(transID) ON DELETE CASCADE,
+    CONSTRAINT td_ID PRIMARY KEY (transID, pID, storeID)
 );
 
 create table inventory(
 	pID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     pname VARCHAR(256) NOT NULL,
-    image VARCHAR(256) NOT NULL /*stores the path to the image, which is actually stored locally*/,
+    image VARCHAR(256) NOT NULL,
     price decimal(6,2) NOT NULL,
     description VARCHAR(256) NOT NULL,
     category VARCHAR(256) NOT NULL,
@@ -76,12 +63,13 @@ create table store(
     city VARCHAR(50) NOT NULL,
     state CHAR(2) NOT NULL
 );
+
 create table inventory_details(
 	pID int NOT NULL,
     storeID int NOT NULL,
     stock int NOT NULL DEFAULT 9999,    
     FOREIGN KEY (pID) REFERENCES inventory(pID) on DELETE CASCADE,
-    foreign key (storeID) REFERENCES store(storeID) on DELETE CASCADE,
+    FOREIGN KEY (storeID) REFERENCES store(storeID) on DELETE CASCADE,
     constraint id_ID primary key (pID, storeID)
 );
 

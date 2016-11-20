@@ -1,66 +1,35 @@
-from flask import Flask, render_template, request, redirect, jsonify, flash, url_for
+from flask import Flask, render_template, request, redirect, url_for
 from flask import flash, session
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
-from flask_wtf import FlaskForm, Form
-from wtforms import StringField, SubmitField, IntegerField, TextField, TextAreaField
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField, IntegerField
 from wtforms.validators import Required, NumberRange
-from wtforms import validators, ValidationError
 from flaskext.mysql import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 # Our written additions
-from settings import app_setup
-from site_functions.shopping import ShoppingCart, CheckoutForm, ShoppingCartButtonForm
-from site_functions import order
-
+from ..settings import app_setup
+from ..site_functions.shopping import ShoppingCart, CheckoutForm, ShoppingCartButtonForm
+from ..site_functions import order
 
 # Initialize Application
-app = app_setup()
-mysql = MySQL()
-mysql.init_app(app)
-bootstrap = Bootstrap(app)
-moment = Moment(app)
+#app = app_setup()
+#mysql = MySQL()
+#mysql.init_app(app)
+#bootstrap = Bootstrap(app)
+#moment = Moment(app)
 
 
-@app.route('/')
+@main.route('/')
 def home():
     try:
         return render_template('home.html')
     except Exception as e:
         print(e)
 
-@app.route('/contact', methods = ['GET', 'POST'])
-def contact():
-            #Fname = request.form['userfname']
-            #Lname = request.form['userlname']
-            #Email = request.form['userEmail']
-            #Phone = request.form['userPhone']
-            #message = request.form['userMessage']
-    class ContactF(Form):
-        fname = TextField('First Name', [validators.Required("Enter your first name")])
-        lname = TextField('Last Name', [validators.Required("Enter your last name")])
-        email = TextField('Email', [validators.Required("Enter your e-mail")])
-        phone = TextField('Phone Number', [validators.Required("Enter your phone number")])
-        message = TextAreaField('Message', [validators.Required("Enter your question")])
-        submit = SubmitField("Submit")
 
-    forms = ContactF()
-    if request.method == 'POST':
-        if forms.validate() == False:
-            flash("Fill required fields.")
-            return render_template('contact.html', forms = forms)
-        else:
-            flash("Sent!")
-            return render_template('home.html', success =  True)
-
-    elif request.method == 'GET':
-        return render_template('contact.html', forms = forms)
-
- 
-
-
-@app.route('/createAccount')
+@main.route('/createAccount')
 def createAccount():
     try:
         return render_template('createAccount.html')
@@ -68,7 +37,7 @@ def createAccount():
         print(e)
 
 
-@app.route('/login')
+@main.route('/login')
 def login():
     try:
         return render_template('login.html')
@@ -76,7 +45,7 @@ def login():
         print(e)
 
 
-@app.route('/logout')
+@main.route('/logout')
 def logout():
     try:
         if 'username' in session:
@@ -90,7 +59,7 @@ def logout():
         print(e)
 
 
-@app.route('/profile')
+@main.route('/profile')
 def profile():
     try:
         if 'username' in session:
@@ -118,7 +87,7 @@ def profile():
         print(e)
 
 
-@app.route('/checkUser',methods = ['POST', 'GET'])
+@main.route('/checkUser',methods = ['POST', 'GET'])
 def checkUser():
     Username = request.form['username']
     Password = request.form['pass']
@@ -131,14 +100,17 @@ def checkUser():
         cursor.execute("Select password,userID from user where username='"+Username+"'")
             
         row = cursor.fetchone ()
+        print(row)
         if not row is None:
             hashed = row[0]
+            print(hashed)
             matches = check_password_hash(hashed, Password)
 
             if matches:
                 flash("Hello, "+Username+"! Welcome!!")
                 session['username'] = Username
                 session['userid'] = row[1]
+                print(session['username'],session['userid'])
             else:
                 flash("Username or Password is wrong")
                 return render_template("login.html")
@@ -150,7 +122,7 @@ def checkUser():
     return redirect(url_for('home'))
 
 
-@app.route('/addUser',methods = ['POST', 'GET'])
+@main.route('/addUser',methods = ['POST', 'GET'])
 def addUser():
    if request.method == 'POST':
          Username = request.form['username']
@@ -167,7 +139,6 @@ def addUser():
          
          conn = mysql.connect()
          cursor = conn.cursor()
-         #data = cursor.fetchone()
          if not cursor is None:
             cursor.execute("SELECT * FROM user WHERE username ='" 
                     + Username + "' OR email ='" + Email + "'")
@@ -179,16 +150,16 @@ def addUser():
                 cursor.execute("INSERT INTO user (username,password,email,fname,lname,"
                      + "street,zip,city,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                      (Username,hashed,Email,Fname,Lname,Street,Zip,City,State))
-                flash ("Successfully registrated")
+                flash ("Successfully Registered")
                 conn.commit()
          else:
-             flash ("Error during insert operation")
+             flash ("Insertion Error")
     
          conn.close()
          return render_template("createAccount.html")
 
 
-@app.route('/updateUser',methods = ['POST', 'GET'])
+@main.route('/updateUser',methods = ['POST', 'GET'])
 def updateUser():
    if request.method == 'POST':
          Fname = request.form['userfname']
@@ -197,10 +168,10 @@ def updateUser():
          Zip = int(request.form['zip'])
          City = request.form['city']
          State = request.form['state']
+         print(Fname,Lname,Street,Zip,City,State)
            
          conn = mysql.connect()
          cursor = conn.cursor()
-         #data = cursor.fetchone()
          if not cursor is None:
             cursor.execute("UPDATE user SET fname=%s,lname=%s,street=%s,zip=%s,city=%s,state=%s WHERE username ='"+session['username']+"'",
                      (Fname,Lname,Street,Zip,City,State))
@@ -213,13 +184,13 @@ def updateUser():
          return redirect(url_for('profile'))
 
 
-@app.route('/confirmation')
+@main.route('/confirmation')
 def order_confirmation():
     # Need to handle true validation / or we just assume it works and outside our scope
     return render_template('order_confirmation.html')
 
 
-@app.route('/checkout', methods=['GET', 'POST'])
+@main.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     if 'username' in session:
         form = CheckoutForm()
@@ -240,7 +211,7 @@ def checkout():
         return redirect(url_for('login'))
 
 
-@app.route('/cart', methods=['GET', 'POST'])
+@main.route('/cart', methods=['GET', 'POST'])
 def shopping_cart():
 
     conn = mysql.connect()
@@ -254,6 +225,7 @@ def shopping_cart():
         cart=session['usercart']
         
         item_forms = usercart.item_forms
+        print(item_forms)
         if form.validate_on_submit():
             if form.checkout_btn.data:
                 session['total'] = usercart.calculate_total()[0]
@@ -272,43 +244,41 @@ def shopping_cart():
 ##                conn.close()
                 
                 return redirect(url_for('shopping_cart'))
-
         return render_template('shopping_cart.html', form=form, 
-                total=usercart.calculate_total(), item_forms=item_forms, 
-                cart=cart, count=0)
+                total=usercart.calculate_total(), item_forms=item_forms, cart=cart, count=0)
     else:
         flash('Please Login')
         return redirect(url_for('login'))
 
 
 # TODO: Implement a dynamic product page
-@app.route('/products', methods=['GET', 'POST'])
+@main.route('/products', methods=['GET', 'POST'])
 def products():
     cursor = mysql.connect().cursor()
-    cursor.execute("select * from inventory") 
+    cursor.execute("SELECT * FROM inventory") 
     rows = cursor.fetchall()    
     return render_template('products.html', products = rows)
 
 
-@app.route('/locations')
+@main.route('/locations')
 def locations():
     cursor = mysql.connect().cursor()
     cursor.execute("select  CONCAT(store.street, ', ', store.city, ', ', store.state, ' ', store.zip) as storeAddress from store") 
     rows = cursor.fetchall()
-    return render_template('locations.html', key=app.config['google_maps'], storeLocations=rows)
+    return render_template('locations.html', key=main.config['google_maps'], storeLocations=rows)
 
 
-@app.route('/trackDelivery/', methods=['GET', 'POST'])
+@main.route('/trackDelivery/', methods=['GET', 'POST'])
 def trackDelivery():
     try:
         transID = request.form['track']
         order1 = order.Order(transID)
-        return render_template('map.html', key=app.config['google_maps'], order1=order1)
+        return render_template('map.html', key=main.config['google_maps'], order1=order1)
     except Exception as e:
         print(e)
 
 
-@app.route('/sproduct', methods=['GET', 'POST'])
+@main.route('/sproduct', methods=['GET', 'POST'])
 def singleproduct():
     try:
         pID = request.args.get('id')
@@ -320,11 +290,12 @@ def singleproduct():
         print(e)
         
 
-@app.route('/product/<int:id>')
+@main.route('/product/<int:id>')
 def product(id):
     if 'username' in session:
         conn = mysql.connect()
         cursor = conn.cursor()
+        print(id)
         
         cursor.execute("SELECT * FROM cart WHERE pID = %s AND username = %s",
                 (id,session['username']))
@@ -355,7 +326,7 @@ def product(id):
         return redirect(url_for('products'))
         
 
-@app.route('/listUser')
+@main.route('/listUser')
 def list():
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT * from orders")
@@ -364,15 +335,5 @@ def list():
     return render_template("list.html",rows = rows)
                         
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
- 
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    return render_template('500.html'), 500
-
-
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0')
+    main.run(host='0.0.0.0')
