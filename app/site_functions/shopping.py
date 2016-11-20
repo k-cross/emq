@@ -46,9 +46,9 @@ class ShoppingCart:
                 'transaction_details_insert' : "INSERT INTO transaction_details("
                     + "transID,pID,price,quantity,storeID) VALUES ("
                     + "'{}', '{}', '{}', '{}', '{}')",
-                'order_update' : "UPDATE orders SET storeAddress = {}, "
-                    + "deliveryEstimateSeconds = {}, deliverDistanceMeters = {}, "
-                    + "deliverDistanceMiles = {}, speed = {} WHERE transID = {}",
+                'order_update' : "UPDATE orders SET storeAddress = %s, "
+                    + "deliveryEstimateSeconds = %s, deliverDistanceMeters = %s, "
+                    + "deliverDistanceMiles = %s, speed = %s WHERE transID = %s",
                 'order_insert' : "INSERT INTO orders(userID, transID, totalCost," 
                         + "orderPlacedTime, items, deliveryAddress) SELECT user.userID "
                         + "AS userID, t.transID, t.total_price, t.trans_time, "
@@ -58,7 +58,7 @@ class ShoppingCart:
                         + "WHERE t.transID = {} and t.userId = user.userID "
                         + "GROUP BY user.userID, t.transID;",
                         }
-
+                
         self.mysql = mysql
         self.session = session
         # self.cart contains (product name, pID, price, quantity)
@@ -133,31 +133,29 @@ class ShoppingCart:
             'Pending',
         ))
         transactionID = cursor.lastrowid
-        print(transactionID)
 
         # self.cart contains (product name, pID, price, quantity)
         for cartrow in self.cart:
-            cursor.execute("SELECT price FROM inventory WHERE pID= %s",(cartrow[1],))
-            productRow = cursor.fetchone ()
-            
             cursor.execute(self.queries['transaction_details_insert'].format(
-                transactionID, cartrow[1], productRow[0], cartrow[3], '1'))
+                transactionID, cartrow[1], cartrow[2], cartrow[3], '1'))
         
         cursor.execute(self.queries['order_insert'].format(transactionID))
         connection.commit()
         cursor.execute(self.queries['grab_orders'].format(transactionID))
         row = cursor.fetchone()
         deliverAddress = row[5]
-        stuff = getDeliveryInfo(deliverAddress)
+        (closest_store, delivery_estimate_seconds, delivery_distance_meters,
+            delivery_distance_miles, speed) = getDeliveryInfo(deliverAddress)
 
-        cursor.execute(self.queries['order_update'].format(
-            stuff[0],
-            stuff[1],
-            stuff[2],
-            stuff[3],
-            stuff[4],
-            stuff[5],
-            transactionID))
+        cursor.execute(self.queries['order_update'],
+            (str(closest_store),
+            delivery_estimate_seconds,
+            delivery_distance_meters,
+            delivery_distance_miles,
+            speed,
+            transactionID
+        ))
+
         cursor.execute(self.queries['checkout_query'].format(self.session['username']))
        
         connection.commit()
