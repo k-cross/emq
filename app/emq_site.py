@@ -146,7 +146,7 @@ def checkUser():
                 flash("Username or Password is wrong")
                 return render_template("login.html")
         else:
-            flash("UserName doesn't exist")
+            flash("Username doesn't exist")
             return render_template("login.html")
     conn.close()
     session['usercart'] = ShoppingCart(mysql, session).cart
