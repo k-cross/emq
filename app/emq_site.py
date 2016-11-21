@@ -33,12 +33,7 @@ def home():
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
-            #Fname = request.form['userfname']
-            #Lname = request.form['userlname']
-            #Email = request.form['userEmail']
-            #Phone = request.form['userPhone']
-            #message = request.form['userMessage']
-    class ContactF(Form):
+    class ContactF(FlaskForm):
         fname = TextField(
             'First Name', [validators.Required("Enter your first name")])
         lname = TextField(

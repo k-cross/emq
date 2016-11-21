@@ -163,8 +163,8 @@ class ShoppingCart:
         cursor.execute(self.queries['grab_orders'].format(transactionID))
         row = cursor.fetchone()
         deliverAddress = row[5]
-        (closest_store, delivery_estimate_seconds, delivery_distance_meters,
-            delivery_distance_miles, speed) = getDeliveryInfo(deliverAddress)
+        (closest_store, deliverAddress, delivery_estimate_seconds, delivery_distance_meters,
+         delivery_distance_miles, speed) = getDeliveryInfo(deliverAddress)
 
         cursor.execute(self.queries['order_update'],
                        (str(closest_store),
