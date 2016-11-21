@@ -2,10 +2,11 @@ import os
 from flask_script import Manager, Shell
 
 # Out Application
-from app import * # Change to various things
+from app import *  # Change to various things
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
+
 
 def make_shell_context():
     return dict(app=app, db=db)
@@ -20,4 +21,4 @@ def test():
     unittest.TextTestRunner(verbosity=2).run(tests)
 
 if __name__ == '__main__':
-    manager.run()
+    janager.run()

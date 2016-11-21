@@ -1,6 +1,7 @@
 import csv
 from flask import Flask
 
+
 def app_setup():
     app = Flask(__name__)
 

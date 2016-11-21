@@ -7,6 +7,7 @@ import site_functions.shopping
 
 
 class ShoppingCartUnitTest(unittest.TestCase):
+
     def setup(self):
         pass
 

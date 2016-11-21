@@ -18,9 +18,10 @@ TAX_RATE = 0.095
 
 
 class CheckoutForm(FlaskForm):
-    credit_card = IntegerField("Credit Card", 
-            validators=[NumberRange(1000000000000000, 9999999999999999)])
-    card_type = SelectField(u'Type', coerce=int, choices=[(1, 'MASTERCARD'), (2, 'VISA')])
+    credit_card = IntegerField("Credit Card",
+                               validators=[NumberRange(1000000000000000, 9999999999999999)])
+    card_type = SelectField(
+        u'Type', coerce=int, choices=[(1, 'MASTERCARD'), (2, 'VISA')])
     checkout_btn = SubmitField('Checkout')
 
 
@@ -30,49 +31,57 @@ class ShoppingCartForm(FlaskForm):
 
 
 class ShoppingCartButtonForm(FlaskForm):
-    update_btn = SelectField(u'Quantity',choices=[(i,i) for i in range(1, 11)])
+    update_btn = SelectField(
+        u'Quantity', choices=[(i, i) for i in range(1, 11)])
 
 
 class ShoppingCart:
+
     def __init__(self, mysql, session):
         self.queries = {
-                'grab_items' : "SELECT pname, cart.pid, price, quantity FROM cart, "
-                    + "inventory WHERE username='{}' and cart.pID=inventory.pID",
-                'grab_orders' : "SELECT * FROM orders WHERE transID = {}",
-                'add_item' : "INSERT INTO cart (username, pID) VALUES ('{}', '{}')",
-                'checkout_query' : "DELETE FROM cart WHERE username='{}'",
-                'transaction_insert' : "INSERT INTO transaction (userID, total_price, "
-                    + "status) VALUES ('{}', '{}', '{}')",
-                'transaction_details_insert' : "INSERT INTO transaction_details("
-                    + "transID,pID,price,quantity,storeID) VALUES ("
-                    + "'{}', '{}', '{}', '{}', '{}')",
-                'order_update' : "UPDATE orders SET storeAddress = %s, "
-                    + "deliveryEstimateSeconds = %s, deliverDistanceMeters = %s, "
-                    + "deliverDistanceMiles = %s, speed = %s WHERE transID = %s",
-                'order_insert' : "INSERT INTO orders(userID, transID, totalCost," 
-                        + "orderPlacedTime, items, deliveryAddress) SELECT user.userID "
+            'grab_items': "SELECT pname, cart.pid, price, quantity FROM cart, "
+            + "inventory WHERE username='{}' and cart.pID=inventory.pID",
+            'grab_orders': "SELECT * FROM orders WHERE transID = {}",
+            'add_item': "INSERT INTO cart (username, pID) VALUES ('{}', '{}')",
+            'update_cart': "UPDATE cart SET quantity={} "
+            + "WHERE pID={} AND username='{}'",
+            'checkout_query': "DELETE FROM cart WHERE username='{}'",
+            'transaction_insert': "INSERT INTO transaction (userID, total_price, "
+            + "status) VALUES ('{}', '{}', '{}')",
+            'transaction_details_insert': "INSERT INTO transaction_details("
+            + "transID,pID,price,quantity,storeID) VALUES ("
+            + "'{}', '{}', '{}', '{}', '{}')",
+            'order_update': "UPDATE orders SET storeAddress = %s, "
+            +
+            "deliveryEstimateSeconds = %s, deliverDistanceMeters = %s, "
+            +
+            "deliverDistanceMiles = %s, speed = %s WHERE transID = %s",
+            'order_insert': "INSERT INTO orders(userID, transID, totalCost,"
+            + "orderPlacedTime, items, deliveryAddress) SELECT user.userID "
                         + "AS userID, t.transID, t.total_price, t.trans_time, "
-                        + "CONCAT('[', GROUP_CONCAT(td.pID SEPARATOR ', '), ']'), "
-                        + "CONCAT(user.street, ', ', user.city, ', ', user.state, ' ',"
-                        + "user.zip) FROM transaction t, transaction_details td, user "
+                        +
+            "CONCAT('[', GROUP_CONCAT(td.pID SEPARATOR ', '), ']'), "
+                        +
+            "CONCAT(user.street, ', ', user.city, ', ', user.state, ' ',"
+                        +
+            "user.zip) FROM transaction t, transaction_details td, user "
                         + "WHERE t.transID = {} and t.userId = user.userID "
                         + "GROUP BY user.userID, t.transID;",
-                        }
-                
+        }
+
         self.mysql = mysql
         self.session = session
-        # self.cart contains (product name, pID, price, quantity)
         self.cart = None
         self.get_items()
 
         # Do this after the database has been queried for info
         self.form = ShoppingCartForm()
-        self.item_forms = [ShoppingCartButtonForm() for i in range(0, len(self.cart))]
+        self.item_forms = [ShoppingCartButtonForm()
+                           for i in range(0, len(self.cart))]
 
         for i in range(0, len(self.item_forms)):
-           self.item_forms[i].update_btn.id='qty_{}'.format(i)
-           self.item_forms[i].update_btn.name= i
-
+            self.item_forms[i].update_btn.id = 'qty_{}'.format(i)
+            self.item_forms[i].update_btn.name = i
 
     def calculate_total(self):
         '''
@@ -95,33 +104,43 @@ class ShoppingCart:
 
         return 0.0, subtotal, 0.0, 0.0
 
-
     def get_items(self):
         connection = self.mysql.connect()
         cursor = connection.cursor()
 
         if 'username' in self.session:
-            cursor.execute(self.queries['grab_items'].format(self.session['username']))
+            cursor.execute(
+                self.queries['grab_items'].format(self.session['username']))
             self.cart = cursor.fetchall()
         else:
             flash('Please Login')
 
         connection.close()
 
-
     def add_item(self, pid):
         connection = self.mysql.connect()
         cursor = connection.cursor()
 
-        cursor.execute(self.queries['add_item'].format(self.session['username'], pid))
+        cursor.execute(
+            self.queries['add_item'].format(self.session['username'], pid))
 
         connection.commit()
         connection.close()
 
-    #TODO: Implement
-    def update_cart(self):
-        pass
+    def update_cart(self, pid, qty):
+        connection = self.mysql.connect()
+        cursor = connection.cursor()
 
+        cursor.execute(self.queries['update_cart'].format(
+            qty,
+            pid,
+            self.session['username']
+        ))
+        connection.commit()
+        connection.close()
+
+        self.get_items()
+        self.session['usercart'] = self.cart
 
     def checkout(self):
         connection = self.mysql.connect()
@@ -138,7 +157,7 @@ class ShoppingCart:
         for cartrow in self.cart:
             cursor.execute(self.queries['transaction_details_insert'].format(
                 transactionID, cartrow[1], cartrow[2], cartrow[3], '1'))
-        
+
         cursor.execute(self.queries['order_insert'].format(transactionID))
         connection.commit()
         cursor.execute(self.queries['grab_orders'].format(transactionID))
@@ -148,16 +167,17 @@ class ShoppingCart:
             delivery_distance_miles, speed) = getDeliveryInfo(deliverAddress)
 
         cursor.execute(self.queries['order_update'],
-            (str(closest_store),
-            delivery_estimate_seconds,
-            delivery_distance_meters,
-            delivery_distance_miles,
-            speed,
-            transactionID
-        ))
+                       (str(closest_store),
+                        delivery_estimate_seconds,
+                        delivery_distance_meters,
+                        delivery_distance_miles,
+                        speed,
+                        transactionID
+                        ))
 
-        cursor.execute(self.queries['checkout_query'].format(self.session['username']))
-       
+        cursor.execute(
+            self.queries['checkout_query'].format(self.session['username']))
+
         connection.commit()
         connection.close()
 
