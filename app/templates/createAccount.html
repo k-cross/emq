@@ -5,13 +5,7 @@
 		{{ super() }}
 		<link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
 	{% endblock %}
-    {% with messages = get_flashed_messages() %}
-	   {% if messages %}
-		  {% for message in messages %}
-			 {{ message }}
-		  {% endfor %}
-	   {% endif %}
-	{% endwith %}
+    
    
 {% block content %}
 	<center><h2>
@@ -29,12 +23,12 @@
     			<form name="newprofile1" action = "{{ url_for('addUser') }}" method = "POST">
     				<!-- NAME -->
     				 <div class="form-group">
-					  <input type="text" name="username" class="form-control" placeholder="Username" required>
+					  <input type="text" name="username" class="form-control" pattern="[a-zA-Z0-9]{1,25}" placeholder="Username" required title="the username should be 1 to 25 characters and number">
 					 </div>
 					 
 					 <!-- PASSWORD -->
 					 <div class="form-group">
-					  <input type="password" name="userpassword" class="form-control" placeholder="PASSWORD" required>
+					  <input type="password" name="userpassword" class="form-control" pattern="[a-zA-Z0-9]{1,15}" placeholder="PASSWORD" required title="the password should be 1 to 15 characters and numbers">
 					 </div>
 					 
 					 <!-- EMAIL -->
@@ -44,22 +38,21 @@
 					
 					 <!-- FIRST LAST NAME -->
 					<div class="form-group">
-					  <input type="text" name="userfname" class="form-control " placeholder="First Name" required>
+					  <input type="text" name="userfname" class="form-control " placeholder="First Name" pattern="[a-zA-Z]{1,15}" required title="1 to 15 Characters only">
                       </div>
                       <div class ="form-group">
-					  <input type="text" name="userlname" class="form-control " placeholder="Last Name"required>
+					  <input type="text" name="userlname" class="form-control " placeholder="Last Name" pattern="[a-zA-Z]{1,15}" required title="1 to 15 Characters only">
 					</div>
 					
 					<div class="form-group">
-					  <input type="text" name="street" class="form-control " placeholder="Street Address" required>
+					  <input type="text" name="street" class="form-control " placeholder="Street Address" pattern="[a-zA-Z0-9\s]{2,25}" required title="Only accept alphabets and numbers">
+					
+					<div class="form-group">
+					  <input type="text" maxlength="5"  name="zip" class="form-control "  placeholder="ZIP" pattern="[0-9]{5}" required title="Must Enter 5 number ex. xxxxx, 95014" >
 					</div>
 					
 					<div class="form-group">
-					  <input type="text" maxlength="5" pattern="[0-9]{5}" name="zip" class="form-control "  placeholder="ZIP" required>
-					</div>
-					
-					<div class="form-group">
-					  <input type="text" name="city" class="form-control " placeholder="City" required>
+					  <input type="text" name="city" class="form-control " placeholder="City" pattern="[a-zA-Z\s]{1,25}" required title="Characters only">
 					</div>
 					
 					<div class="form-group">

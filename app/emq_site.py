@@ -103,7 +103,10 @@ def profile():
                 row = cursor.fetchone ()
 
                 cursor.execute("Select total_price, trans_time, status, transID from transaction where userid=%s",(session['userid']))
+                
+
                 orderRows = cursor.fetchall()
+                
                 
             conn.close()
             return render_template('profile.html',username=session['username'], email=row[0],
@@ -290,7 +293,7 @@ def products():
     return render_template('products.html', products = rows)
 
 
-@app.route('/locations')
+@app.route('/about')
 def locations():
     cursor = mysql.connect().cursor()
     cursor.execute("select  CONCAT(store.street, ', ', store.city, ', ', store.state, ' ', store.zip) as storeAddress from store") 
