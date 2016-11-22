@@ -39,10 +39,10 @@ def contact():
         lname = TextField(
             'Last Name', [validators.Required("Enter your last name")])
         email = TextField('Email', [validators.Required("Enter your e-mail")])
-        phone = TextField(
-            'Phone Number', [validators.Required("Enter your phone number")])
+        phone = IntegerField(
+            'Phone Number', validators = [NumberRange(1000000000, 9999999999)])
         message = TextAreaField(
-            'Message', [validators.Required("Enter your question")])
+            'Message', [validators.Required("Enter your message")])
         submit = SubmitField("Submit")
 
     forms = ContactF()
@@ -51,7 +51,7 @@ def contact():
             flash("Fill required fields.")
             return render_template('contact.html', forms=forms)
         else:
-            flash("Sent!")
+            flash("Message sent. We will be contacting you soon.")
             return render_template('home.html', success=True)
 
     elif request.method == 'GET':
@@ -170,7 +170,7 @@ def addUser():
 
         conn = mysql.connect()
         cursor = conn.cursor()
-        #data = cursor.fetchone()
+        
         if not cursor is None:
             cursor.execute("SELECT * FROM user WHERE username ='"
                            + Username + "' OR email ='" + Email + "'")
@@ -183,7 +183,7 @@ def addUser():
                                +
                                "street,zip,city,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                (Username, hashed, Email, Fname, Lname, Street, Zip, City, State))
-                flash("Successfully registrated")
+                flash("Successfully Registered")
                 conn.commit()
         else:
             flash("Error during insert operation")
@@ -204,7 +204,7 @@ def updateUser():
 
         conn = mysql.connect()
         cursor = conn.cursor()
-        #data = cursor.fetchone()
+        
         if not cursor is None:
             cursor.execute("UPDATE user SET fname=%s,lname=%s,street=%s,zip=%s,city=%s,state=%s WHERE username ='" + session['username'] + "'",
                            (Fname, Lname, Street, Zip, City, State))
@@ -376,8 +376,6 @@ def product(id):
                 return redirect(url_for('products'))
         else:
             
-            print("testingtesting")
-            #add from products page
             conn = mysql.connect()
             cursor = conn.cursor()
 
