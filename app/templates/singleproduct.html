@@ -11,34 +11,33 @@
 
 {% block page_content %}
 <div class="product">
-  <div class="header">
-    <div class="back"></div>
-  </div>
-  <div class="main">
-    <div class="left">
-      <h1>{{product[1]}}</h1>
-      <h3>${{product[3]}}</h3>
-      <img src="{{product[2]}}" width = 150 height = 300 alt="" />
+    <div class="header">
+        <div class="back"></div>
     </div>
-    <div class="right">
-      <p>{{product[4]}}</p>
-      <p>In stock.</p>
-      <div class="product-quantity">
-                <label for="product-quantity-input" class="product-quantity-label">Quantity</label>
-                <div>
-                  <input type="text" id="product-quantity-input" placeholder="0" value="0" maxlength="1"/>
-                </div>
-              </div>
+    <div class="main">
+        <div class="left">
+            <h1>{{product[1]}}</h1>
+            <h3>${{product[3]}}</h3>
+            <img src="{{product[2]}}" width = 150 height = 300 alt="" />
+        </div>
+        <div class="right">
+            <p>{{product[4]}}</p>
+        </div>
     </div>
-  </div>
-  <div class="footer">
-    <div class="left">
-      <p id="price">$960.00</p>
+    <div class="footer">
+        {% if product[7] == 0 %}
+            <div class="left">  
+                <h2>Out of stock.</h2>
+            </div>
+        {% else %}
+            <div class="left">
+                <h2>In stock.</h2>
+            </div>
+            <div class="right">
+                <a class="btn btn-success" href="./product/{{product[0]}}">Add to cart</a>
+            </div>
+        {% endif %}
     </div>
-    <div class="right">
-      <a class="btn btn-success" href="./product/{{product[0]}}">Add to cart</a>
-    </div>
-  </div>
 </div>
 
 <script>

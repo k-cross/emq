@@ -289,6 +289,15 @@ def shopping_cart():
 @app.route('/products', methods=['GET', 'POST'])
 def products():
     cursor = mysql.connect().cursor()
+    if request.method == 'POST':
+        searchTerm = request.form['search'].strip()
+        queryTerm = '\'%' + searchTerm + '%\''       
+        query = ("select * from inventory where pname like %s" % queryTerm)
+        cursor.execute(query)
+    else:
+        cursor.execute("select * from inventory") 
+    rows = cursor.fetchall()    
+    return render_template('products.html', products = rows)
     cursor.execute("select * from inventory")
     rows = cursor.fetchall()
     return render_template('products.html', products=rows)
@@ -318,9 +327,12 @@ def singleproduct():
     try:
         pID = request.args.get('id')
         cursor = mysql.connect().cursor()
-        cursor.execute("select * from inventory where pID =" + str(pID))
+        cursor.execute("select I.*, SUM(I_D.stock) from inventory I, inventory_details I_D where I.pID = I_D.pID and I.pID =" + str(pID))
         row = cursor.fetchone()
-        return render_template('singleproduct.html', product=row)
+        if(cursor.rowcount != 0):
+            return render_template('singleproduct.html', product=row)
+        else:
+            return render_template('product_not_exist.html')
     except Exception as e:
         print(e)
 

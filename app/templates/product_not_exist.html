@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}EMQ - Product does not exist{% endblock %}
+
+{% block styles %}
+	{{ super() }}
+	<!-- Super is for flask-bootstrap -->
+	<link href="{{ url_for('static', filename='product-style.css') }}" rel="stylesheet">
+
+{% endblock %}
+
+
+{% block page_content %}
+<div class="product">
+    <div class="header">
+    </div>
+    <div class="main">
+        <p>This product does not exist. Perhaps you were looking for something else.</p>
+    </div>
+    <div class="footer">
+        
+    </div>
+</div>
+{% endblock %}
+
