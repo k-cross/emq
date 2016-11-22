@@ -11,6 +11,7 @@
 
 {% block page_content %}
 <div class="product">
+	<form name="addSproduct" id="addSproduct" action = "../product/{{product[0]}}" method = "POST">
     <div class="header">
         <div class="back"></div>
     </div>
@@ -22,6 +23,14 @@
         </div>
         <div class="right">
             <p>{{product[4]}}</p>
+			{% if product[7] > 0 %}
+				<div class="product-quantity">
+					<label for="product-quantity-input" class="product-quantity-label">Quantity</label>
+					<div>
+					  <input type="text" id="product-quantity-input" name="product-quantity-input" placeholder="1" value="1" maxlength="1"/>
+					</div>
+				</div>
+			{% endif %}
         </div>
     </div>
     <div class="footer">
@@ -34,10 +43,12 @@
                 <h2>In stock.</h2>
             </div>
             <div class="right">
-                <a class="btn btn-success" href="./product/{{product[0]}}">Add to cart</a>
+                 <!--<a class="btn btn-success" href="./product/{{product[0]}}">Add to cart</a>
+		  --><input type = "submit"  class="button buttonBlue" value = "Add to cart" />
             </div>
         {% endif %}
     </div>
+	</form>
 </div>
 {% endblock %}
 

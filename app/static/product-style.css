@@ -41,6 +41,7 @@ p{
 .yellow{
   color: $giallo;
 }
+
 .product{
   height:500px;
   width:600px;

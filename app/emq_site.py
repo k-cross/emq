@@ -11,7 +11,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 # Our written additions
 from settings import app_setup
-from site_functions.shopping import ShoppingCart, CheckoutForm, ShoppingCartButtonForm
+from site_functions.shopping import ShoppingCart, CheckoutForm
 from site_functions import order
 
 
@@ -257,29 +257,23 @@ def shopping_cart():
         session['usercart'] = usercart.cart
         cart = session['usercart']
 
-        item_forms = usercart.item_forms
-        if form.validate_on_submit():
-            if form.checkout_btn.data:
-                session['total'] = usercart.calculate_total()[0]
-                return redirect(url_for('checkout'))
+        #update quantity
+        if request.method == 'POST':
+            #checkout 
+            if form.validate_on_submit():
+                print("66")
+                if form.checkout_btn.data:
+                    session['total'] = usercart.calculate_total()[0]
+                    return redirect(url_for('checkout'))
             else:
-                # TODO: Implement update
-                # for i in range(0, len(cart)):
-                ##                    string = str(i)
-                ##                    item = item_forms[i].update_btn
-                # item = request.args.get(string)
-                # print(item.data)
-                # cursor.execute("UPDATE cart SET quantity =%s WHERE pID=%s",
-                # (item, 1))
-                # conn.commit()
-                ##                flash ("Cart Updated")
-                # conn.close()
-
-                return redirect(url_for('shopping_cart'))
+                quantity = request.form['quantity']
+                i = request.form['id']
+                print(i+" "+quantity)
+                usercart.update_cart(cart[int(i)-1][1], quantity)    
+                return redirect(url_for('shopping_cart'))        
 
         return render_template('shopping_cart.html', form=form,
-                               total=usercart.calculate_total(), item_forms=item_forms,
-                               cart=cart, count=0)
+                               total=usercart.calculate_total(), cart=cart, count=0)
     else:
         flash('Please Login')
         return redirect(url_for('login'))
@@ -337,41 +331,80 @@ def singleproduct():
         print(e)
 
 
-@app.route('/product/<int:id>')
+@app.route('/product/<int:id>', methods=['GET', 'POST'])
 def product(id):
+    
     if 'username' in session:
-        conn = mysql.connect()
-        cursor = conn.cursor()
+       
+        #add from Single product page
+        if request.method == 'POST':
+            
+            product_Quantity = request.form['product-quantity-input']
+            conn = mysql.connect()
+            cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM cart WHERE pID = %s AND username = %s",
-                       (id, session['username']))
-        row = cursor.fetchone()
-
-        if row is None:
-            cursor.execute("INSERT INTO cart (username, pID, quantity) VALUES (%s, %s, %s)",
-                           (session['username'], id, 1))
-            conn.commit()
-            conn.close()
-            flash("New item is added to cart")
-            return redirect(url_for('products'))
-
-        else:
-            cursor.execute("SELECT quantity FROM cart WHERE pID = %s", (id))
+            cursor.execute("SELECT * FROM cart WHERE pID = %s AND username = %s",
+                           (id, session['username']))
             row = cursor.fetchone()
 
-            quantity = row[0]
-            quantity = quantity + 1
+            if row is None:
+                
+                cursor.execute("INSERT INTO cart (username, pID, quantity) VALUES (%s, %s, %s)",
+                               (session['username'], id, product_Quantity))
+                conn.commit()
+                conn.close()
+                flash("New item is added to cart")
+                return redirect(url_for('products'))
 
-            cursor.execute(
-                "UPDATE cart SET quantity=%s WHERE pID = %s", (quantity, id))
-            conn.commit()
-            conn.close()
-            flash("Seleted is increaed by one")
-            return redirect(url_for('products'))
+            else:
+                
+                cursor.execute("SELECT quantity FROM cart WHERE pID = %s", (id))
+                row = cursor.fetchone()
+                
+                quantity = row[0]
+                quantity = quantity + int(product_Quantity)
+
+                cursor.execute("UPDATE cart SET quantity=%s WHERE pID = %s", (quantity, id))
+                conn.commit()
+                conn.close()
+                flash("Seleted item is increaed by "+ product_Quantity)
+                return redirect(url_for('products'))
+        else:
+            
+            print("testingtesting")
+            #add from products page
+            conn = mysql.connect()
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT * FROM cart WHERE pID = %s AND username = %s",
+                               (id, session['username']))
+            row = cursor.fetchone()
+
+            if row is None:
+                cursor.execute("INSERT INTO cart (username, pID, quantity) VALUES (%s, %s, %s)",
+                               (session['username'], id, 1))
+                conn.commit()
+                conn.close()
+                flash("New item is added to cart")
+                return redirect(url_for('products'))
+
+            else:
+                cursor.execute("SELECT quantity FROM cart WHERE pID = %s", (id))
+                row = cursor.fetchone()
+                
+                quantity = row[0]
+                quantity = quantity + 1
+
+                cursor.execute("UPDATE cart SET quantity=%s WHERE pID = %s", (quantity, id))
+                conn.commit()
+                conn.close()
+                flash("Seleted item is increaed by 1")
+                return redirect(url_for('products'))
+            
     else:
         flash("Please Login First")
         return redirect(url_for('products'))
-
+ 
 
 @app.route('/listUser')
 def list():

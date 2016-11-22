@@ -7,13 +7,19 @@
 </div>
 
 <div class="page-content">
-    {% for item in item_forms %}
+    {% for i in cart %}
 	
     <span class='cart-items'>
 	
 		<div id="cart-items-container">
 			<div class="col-md-6 cart-items-label">{{cart[count][0]}} <br> Price:{{cart[count][2]}} X {{ cart[count][3] }}{% set count = count + 1 %} </div>
-			<div class="col-md-6 items-form"> {{ wtf.quick_form(item) }} <!-- TODO: Add Product names here --></div>
+			<div class="col-md-6 items-form"> 
+				<form name="{{count}}" action = "../cart" method = "POST">
+					<input type="number" name="quantity" value="{{cart[count-1][3]}}" style="border: 1px solid;" min="0" max= "99" >
+					<input type="number" name="id" value="{{count}}" style="display:none" value="Update">
+					<input class="btn btn-default" id="update_btn" name="update_btn" type="submit" value="Update">
+				</form>
+			</div>
 		</div>
     </span>
     {% endfor %}

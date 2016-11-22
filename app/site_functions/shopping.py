@@ -26,13 +26,7 @@ class CheckoutForm(FlaskForm):
 
 
 class ShoppingCartForm(FlaskForm):
-    update_btn = SubmitField('Update')
     checkout_btn = SubmitField('Checkout')
-
-
-class ShoppingCartButtonForm(FlaskForm):
-    update_btn = SelectField(
-        u'Quantity', choices=[(i, i) for i in range(1, 11)])
 
 
 class ShoppingCart:
@@ -78,12 +72,7 @@ class ShoppingCart:
 
         # Do this after the database has been queried for info
         self.form = ShoppingCartForm()
-        self.item_forms = [ShoppingCartButtonForm()
-                           for i in range(0, len(self.cart))]
 
-        for i in range(0, len(self.item_forms)):
-            self.item_forms[i].update_btn.id = 'qty_{}'.format(i)
-            self.item_forms[i].update_btn.name = i
 
     def calculate_total(self):
         '''

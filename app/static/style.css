@@ -233,3 +233,11 @@ input {
     font-weight: 600;
     font-family: "Goudy Old Style", Garamond, "Big Caslon", "Times New Roman", serif;
 }
+#addSproduct{
+	width: 100%;
+    margin: 0px;
+    padding: 0px;
+    background: none;
+    border: none;
+    box-shadow: none;
+}
