@@ -401,15 +401,6 @@ def product(id):
         return redirect(url_for('products'))
  
 
-@app.route('/listUser')
-def list():
-    cursor = mysql.connect().cursor()
-    cursor.execute("SELECT * from orders group by transID")
-    rows = cursor.fetchall()
-
-    return render_template("list.html", rows=rows)
-
-
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
