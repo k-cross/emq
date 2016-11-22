@@ -65,14 +65,15 @@ class Order:
 
 
 def getClosestStore(address):
-    closestStore = ['store', 'None']
+    closestStore = [0, 'store', 'None']
     cursor = mysql.connect().cursor()
     cursor.execute(
-        "select  CONCAT('\\'', store.street, ', ', store.city, ', ', store.state, '\\'') from store")
+        "select  storeID, CONCAT('\\'', store.street, ', ', store.city, ', ', store.state, '\\'') from store")
     # , '1107 S King Rd, San Jose, CA', 'walmart mountain view, CA', 'safeway shoreline blvd mountain view, CA']
     listOfStores = cursor.fetchall()
     for store in listOfStores:
-        store = str(store[0])
+        storeID = store[0]
+        store = str(store[1])  
         distanceMatrix = gmaps.distance_matrix(
             store, address, mode='driving', departure_time=datetime.now(), units='imperial')
         tempDistance = distanceMatrix['rows'][0][
@@ -81,23 +82,25 @@ def getClosestStore(address):
         # print distanceMatrix['rows'][0]['elements'][0]['distance']['text']
         # print tempDistance
         # print '--------'
-        if (closestStore[1] == 'None'):
-            closestStore = [store, tempDistance]
-        elif(tempDistance < closestStore[1]):
-            closestStore = [store, tempDistance]
+        if (closestStore[2] == 'None'):
+            closestStore = [storeID, store, tempDistance]
+        elif(tempDistance < closestStore[2]):
+            closestStore = [storeID, store, tempDistance]
         else:
             pass
-    return str(closestStore[0]).strip()
+    return closestStore[0], str(closestStore[1]).strip()
 
 
 def getDeliveryInfo(deliveryAddress):
     try:
         #distanceMatrix = gmaps.distance_matrix(self.storeAddress, self.deliveryAddress, mode='driving', departure_time=datetime.now(), units='imperial')
         #deliveryEstimateSeconds = distanceMatrix['rows'][0]['elements'][0]['duration_in_traffic']['value']
-        closestStore = str(getClosestStore(deliveryAddress))
-        #print ("CLOSEST " + str(closestStore))
+        closestStore = getClosestStore(deliveryAddress)
+        storeAddress = str(closestStore[1])
+        storeID = closestStore[0]
+        
         directions = gmaps.directions(str(
-            closestStore), deliveryAddress, mode='driving', departure_time=datetime.now(), units='imperial')
+            storeAddress), deliveryAddress, mode='driving', departure_time=datetime.now(), units='imperial')
 
         deliveryEstimateTotalSeconds = directions[0][
             'legs'][0]['duration_in_traffic']['value']
@@ -105,7 +108,7 @@ def getDeliveryInfo(deliveryAddress):
         deliveryDistanceMiles = directions[0]['legs'][0]['distance']['text']
         speed = round(
             float(deliveryDistanceMeters) / float(deliveryEstimateTotalSeconds), 5)  # m/s
-        return closestStore, deliveryAddress, deliveryEstimateTotalSeconds, deliveryDistanceMeters, deliveryDistanceMiles, speed
+        return storeID, storeAddress, deliveryAddress, deliveryEstimateTotalSeconds, deliveryDistanceMeters, deliveryDistanceMiles, speed
     except Exception as e:
         print(e)
 

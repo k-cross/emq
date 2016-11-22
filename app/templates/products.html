@@ -29,9 +29,15 @@
                             <p class="lead">
                                 {{product[3]}}</p>
                         </div>
-                        <div class="col-xs-12 col-md-6">
-                            <a class="btn btn-success" href="./product/{{product[0]}}">Add to cart</a>
-                        </div>
+						{% if product[7] == 0 %}
+						<div class="col-xs-12 col-md-6">  
+							<p>Out of stock.</p>
+						</div>
+						{% else %}						
+						<div class="col-xs-12 col-md-6">
+							<a class="btn btn-success" href="./product/{{product[0]}}">Add to cart</a>
+						</div>
+						{% endif %}
                     </div>
                 </div>
             </div>

@@ -292,15 +292,12 @@ def products():
     if request.method == 'POST':
         searchTerm = request.form['search'].strip()
         queryTerm = '\'%' + searchTerm + '%\''       
-        query = ("select * from inventory where pname like %s" % queryTerm)
+        query = ("select I.*, SUM(I_D.stock) from inventory I, inventory_details I_D where I.pID = I_D.pID and pname like %s group by I.pID" % queryTerm)
         cursor.execute(query)
     else:
-        cursor.execute("select * from inventory") 
+        cursor.execute("select I.*, SUM(I_D.stock) from inventory I, inventory_details I_D where I.pID = I_D.pID group by I.pID") 
     rows = cursor.fetchall()    
     return render_template('products.html', products = rows)
-    cursor.execute("select * from inventory")
-    rows = cursor.fetchall()
-    return render_template('products.html', products=rows)
 
 
 @app.route('/about')
@@ -327,9 +324,12 @@ def singleproduct():
     try:
         pID = request.args.get('id')
         cursor = mysql.connect().cursor()
-        cursor.execute("select I.*, SUM(I_D.stock) from inventory I, inventory_details I_D where I.pID = I_D.pID and I.pID =" + str(pID))
+        cursor.execute("select I.* from inventory I where I.pID =" + str(pID))
         row = cursor.fetchone()
+        print (cursor.rowcount)
         if(cursor.rowcount != 0):
+            cursor.execute("select I.*, SUM(I_D.stock) from inventory I, inventory_details I_D where I.pID = I_D.pID and I.pID =" + str(pID))
+            row = cursor.fetchone()
             return render_template('singleproduct.html', product=row)
         else:
             return render_template('product_not_exist.html')
@@ -376,7 +376,7 @@ def product(id):
 @app.route('/listUser')
 def list():
     cursor = mysql.connect().cursor()
-    cursor.execute("SELECT * from orders")
+    cursor.execute("SELECT * from orders group by transID")
     rows = cursor.fetchall()
 
     return render_template("list.html", rows=rows)

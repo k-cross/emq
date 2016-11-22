@@ -71,18 +71,18 @@ insert into inventory_details (pId, storeID) values (2, 10);
 insert into inventory_details (pId, storeID) values (2, 11);
 insert into inventory_details (pId, storeID) values (2, 12);
 
-insert into inventory_details (pId, storeID) values (3, 1);
-insert into inventory_details (pId, storeID) values (3, 2);
-insert into inventory_details (pId, storeID) values (3, 3);
-insert into inventory_details (pId, storeID) values (3, 4);
-insert into inventory_details (pId, storeID) values (3, 5);
-insert into inventory_details (pId, storeID) values (3, 6);
-insert into inventory_details (pId, storeID) values (3, 7);
-insert into inventory_details (pId, storeID) values (3, 8);
-insert into inventory_details (pId, storeID) values (3, 9);
-insert into inventory_details (pId, storeID) values (3, 10);
-insert into inventory_details (pId, storeID) values (3, 11);
-insert into inventory_details (pId, storeID) values (3, 12);
+insert into inventory_details (pId, storeID, stock) values (3, 1, 0);
+insert into inventory_details (pId, storeID, stock) values (3, 2, 0);
+insert into inventory_details (pId, storeID, stock) values (3, 3, 0);
+insert into inventory_details (pId, storeID, stock) values (3, 4, 0);
+insert into inventory_details (pId, storeID, stock) values (3, 5, 0);
+insert into inventory_details (pId, storeID, stock) values (3, 6, 0);
+insert into inventory_details (pId, storeID, stock) values (3, 7, 0);
+insert into inventory_details (pId, storeID, stock) values (3, 8, 0);
+insert into inventory_details (pId, storeID, stock) values (3, 9, 0);
+insert into inventory_details (pId, storeID, stock) values (3, 10, 0);
+insert into inventory_details (pId, storeID, stock) values (3, 11, 0);
+insert into inventory_details (pId, storeID, stock) values (3, 12, 0);
 
 insert into inventory_details (pId, storeID) values (4, 1);
 insert into inventory_details (pId, storeID) values (4, 2);
@@ -151,7 +151,7 @@ select* from inventory, inventory_details where inventory.pID=inventory_details.
 
 select* from orders_test;
 /*select  CONCAT('\'', store.street, ', ', store.city, ', ', store.state, '\'') from store;*/
-select * from orders where transID = 1;
+select * from orders ;
 /*insert into orders(userID,
     transID,
     totalCost,

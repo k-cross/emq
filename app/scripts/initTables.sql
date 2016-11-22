@@ -105,3 +105,16 @@ create view orders_test as SELECT user.userID as userID, t.transID as transID, t
 									td.storeId = store.storeID and
                                     t.userId = user.userId
 								GROUP BY user.userID, t.transID;
+
+SET SQL_SAFE_UPDATES=0;
+CREATE TRIGGER update_stock AFTER INSERT ON transaction_details
+FOR EACH ROW
+	UPDATE 
+		inventory_details I
+    INNER JOIN 
+		transaction_details T
+    SET 
+		I.stock = I.stock - T.quantity 
+    where 
+		I.pID = T.pID and I.storeID = T.storeID
+    ;

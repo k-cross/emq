@@ -65,8 +65,10 @@ class ShoppingCart:
             "CONCAT(user.street, ', ', user.city, ', ', user.state, ' ',"
                         +
             "user.zip) FROM transaction t, transaction_details td, user "
-                        + "WHERE t.transID = {} and t.userId = user.userID "
+                        + "WHERE t.transID = {} and t.transID = td.transID and t.userId = user.userID "
                         + "GROUP BY user.userID, t.transID;",
+            'grab_address': "SELECT CONCAT(user.street, ', ', user.city, ', ', user.state, ' ', user.zip) FROM USER WHERE userID = {};",
+            'update_status': "UPDATE transaction SET status = {} where transID = {}"
         }
 
         self.mysql = mysql
@@ -146,6 +148,13 @@ class ShoppingCart:
         connection = self.mysql.connect()
         cursor = connection.cursor()
 
+        cursor.execute(self.queries['grab_address'].format(self.session['userid']))
+        deliverAddress = cursor.fetchone()[0]
+        
+    
+        (storeID, closest_store, deliverAddress, delivery_estimate_seconds, delivery_distance_meters,
+         delivery_distance_miles, speed) = getDeliveryInfo(deliverAddress)
+              
         cursor.execute(self.queries['transaction_insert'].format(
             self.session['userid'],
             self.session['total'],
@@ -156,15 +165,12 @@ class ShoppingCart:
         # self.cart contains (product name, pID, price, quantity)
         for cartrow in self.cart:
             cursor.execute(self.queries['transaction_details_insert'].format(
-                transactionID, cartrow[1], cartrow[2], cartrow[3], '1'))
+                transactionID, cartrow[1], cartrow[2], cartrow[3], storeID))
 
         cursor.execute(self.queries['order_insert'].format(transactionID))
         connection.commit()
         cursor.execute(self.queries['grab_orders'].format(transactionID))
-        row = cursor.fetchone()
-        deliverAddress = row[5]
-        (closest_store, deliverAddress, delivery_estimate_seconds, delivery_distance_meters,
-         delivery_distance_miles, speed) = getDeliveryInfo(deliverAddress)
+
 
         cursor.execute(self.queries['order_update'],
                        (str(closest_store),
@@ -177,7 +183,7 @@ class ShoppingCart:
 
         cursor.execute(
             self.queries['checkout_query'].format(self.session['username']))
-
+        cursor.execute(self.queries['update_status'].format('\'Out for delivery\'' ,transactionID))
         connection.commit()
         connection.close()
 
