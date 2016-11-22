@@ -2,6 +2,50 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-<div class="page-header">
-  <h1>Order Confirmed</h1>
+<div class = "order_body"><h1>Thank you for your order!</h1>
+
+<div class ="message"><p>Order has been placed! Your receipt: </p>
+    <h3>Order # XXXXXXXX</h3>
+
+ <div class="order_details">
+      <div class="product_information">
+        <div class="order_imgage">
+          <h3>Product</h3>
+        </div>
+        <div class="price">
+          <h3>Price</h3>
+        </div>
+        <div class="quantity">
+          <h3>Quantity</h3>
+        </div>
+        <div class="subtotal">
+          <h3>Subtotal</h3>
+        </div>
+      </div>
+      <div class="clear"></div>
+      <div class="product_information">
+        <div class="order_imgage">
+          <p>Name of item</p>
+        </div>
+        <div class="price">
+          <p>Price of item</p>
+        </div>
+        <div class="quantity">
+          <div class="addSubtract">
+            <p>Quantity of item</p>
+          </div>
+        </div>
+        <div class="subtotal">
+          <p>Subtotal of item</p>
+        </div>
+      </div>
+     
+     <div class="clear"></div>
+    
+    
+    <div class="clear"></div>
+      </div>
+
+      
+    
 {% endblock %}
