@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
-#from mysql import MySQL
+from flaskext.mysql import MySQL
 from config import config
 
 bootstrap = Bootstrap()
