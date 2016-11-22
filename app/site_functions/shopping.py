@@ -9,7 +9,7 @@ from flaskext.mysql import MySQL
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField, SelectField
 from wtforms.validators import Required, NumberRange
-from .order import Order, getDeliveryInfo
+from .order import Order, getDeliveryInfo, isDeliverable
 
 
 # GLOBALS
@@ -59,10 +59,10 @@ class ShoppingCart:
             "CONCAT(user.street, ', ', user.city, ', ', user.state, ' ',"
                         +
             "user.zip) FROM transaction t, transaction_details td, user "
-                        + "WHERE t.transID = {} and t.transID = td.transID AND t.userId = user.userID "
+                        + "WHERE t.transID = {} and t.transID = td.transID and t.userId = user.userID "
                         + "GROUP BY user.userID, t.transID;",
-            'grab_address': "SELECT CONCAT(user.street, ', ', user.city, ', ', user.state, ' ', user.zip) FROM user WHERE userID = {};",
-            'update_status': "UPDATE transaction SET status = {} WHERE transID = {}"
+            'grab_address': "SELECT CONCAT(user.street, ', ', user.city, ', ', user.state, ' ', user.zip) FROM USER WHERE userID = {};",
+            'update_status': "UPDATE transaction SET status = {} where transID = {}"
         }
 
         self.mysql = mysql
@@ -72,6 +72,7 @@ class ShoppingCart:
 
         # Do this after the database has been queried for info
         self.form = ShoppingCartForm()
+
 
     def calculate_total(self):
         '''
@@ -136,13 +137,15 @@ class ShoppingCart:
         connection = self.mysql.connect()
         cursor = connection.cursor()
 
-        cursor.execute(self.queries['grab_address'].format(
-            self.session['userid']))
+        cursor.execute(self.queries['grab_address'].format(self.session['userid']))
         deliverAddress = cursor.fetchone()[0]
 
+        if not isDeliverable(deliverAddress):
+            return False
+    
         (storeID, closest_store, deliverAddress, delivery_estimate_seconds, delivery_distance_meters,
-         delivery_distance_miles, speed) = getDeliveryInfo(deliverAddress)
-
+            delivery_distance_miles, speed) = getDeliveryInfo(deliverAddress)
+              
         cursor.execute(self.queries['transaction_insert'].format(
             self.session['userid'],
             self.session['total'],
@@ -159,6 +162,7 @@ class ShoppingCart:
         connection.commit()
         cursor.execute(self.queries['grab_orders'].format(transactionID))
 
+
         cursor.execute(self.queries['order_update'],
                        (str(closest_store),
                         delivery_estimate_seconds,
@@ -170,10 +174,11 @@ class ShoppingCart:
 
         cursor.execute(
             self.queries['checkout_query'].format(self.session['username']))
-        cursor.execute(self.queries['update_status'].format(
-            '\'Out for delivery\'', transactionID))
+        cursor.execute(self.queries['update_status'].format('\'Out for delivery\'' ,transactionID))
         connection.commit()
         connection.close()
 
         self.get_items()
         self.session['usercart'] = self.cart
+
+        return True

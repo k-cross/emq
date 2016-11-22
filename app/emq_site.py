@@ -39,12 +39,11 @@ def contact():
         lname = TextField(
             'Last Name', [validators.Required("Enter your last name")])
         email = TextField('Email', [validators.Required("Enter your e-mail")])
-        phone = IntegerField(
-            'Phone Number', validators = [NumberRange(1000000000, 9999999999)])
+        phone = TextField(
+            'Phone Number', [validators.Required("Enter your phone number")])
         message = TextAreaField(
-            'Message', [validators.Required("Enter your message")])
+            'Message', [validators.Required("Enter your question")])
         submit = SubmitField("Submit")
-        
 
     forms = ContactF()
     if request.method == 'POST':
@@ -52,7 +51,7 @@ def contact():
             flash("Fill required fields.")
             return render_template('contact.html', forms=forms)
         else:
-            flash("Message sent. We will be contacting you soon.")
+            flash("Sent!")
             return render_template('home.html', success=True)
 
     elif request.method == 'GET':
@@ -171,6 +170,7 @@ def addUser():
 
         conn = mysql.connect()
         cursor = conn.cursor()
+        #data = cursor.fetchone()
         if not cursor is None:
             cursor.execute("SELECT * FROM user WHERE username ='"
                            + Username + "' OR email ='" + Email + "'")
@@ -183,7 +183,7 @@ def addUser():
                                +
                                "street,zip,city,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                (Username, hashed, Email, Fname, Lname, Street, Zip, City, State))
-                flash("Successfully Registered")
+                flash("Successfully registrated")
                 conn.commit()
         else:
             flash("Error during insert operation")
@@ -204,6 +204,7 @@ def updateUser():
 
         conn = mysql.connect()
         cursor = conn.cursor()
+        #data = cursor.fetchone()
         if not cursor is None:
             cursor.execute("UPDATE user SET fname=%s,lname=%s,street=%s,zip=%s,city=%s,state=%s WHERE username ='" + session['username'] + "'",
                            (Fname, Lname, Street, Zip, City, State))
@@ -218,6 +219,8 @@ def updateUser():
 
 @app.route('/confirmation')
 def order_confirmation():
+    # Need to handle true validation / or we just assume it works and outside
+    # our scope
     return render_template('order_confirmation.html')
 
 
@@ -225,7 +228,10 @@ def order_confirmation():
 def checkout():
     if 'username' in session:
         form = CheckoutForm()
-
+        if session['total'] == 0:
+            flash("No item in the shopping cart")
+            return redirect(url_for('shopping_cart'))
+        
         if 'usercart' not in session:
             return redirect(url_for('shopping_cart'))
 
@@ -233,7 +239,10 @@ def checkout():
             cc = form.credit_card.data
             ct = form.card_type.data
 
-            ShoppingCart(mysql, session).checkout()
+            # TODO: Replace with shopping cart function logic
+            if not ShoppingCart(mysql, session).checkout():
+                flash("The address must within the bay area")
+                return redirect(url_for('shopping_cart'))
 
             return redirect(url_for('order_confirmation'))
         return render_template('checkout.html', form=form, total=session['total'])
@@ -366,6 +375,9 @@ def product(id):
                 flash("Seleted item is increaed by "+ product_Quantity)
                 return redirect(url_for('products'))
         else:
+            
+            print("testingtesting")
+            #add from products page
             conn = mysql.connect()
             cursor = conn.cursor()
 
@@ -398,6 +410,7 @@ def product(id):
         flash("Please Login First")
         return redirect(url_for('products'))
  
+
 
 @app.errorhandler(404)
 def page_not_found(e):
