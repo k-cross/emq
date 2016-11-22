@@ -1,7 +1,7 @@
+#!/usr/bin/env python
 import os
 from flask_script import Manager, Shell
-
-# Out Application
+# Our Application
 from app import *  # Change to various things
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
@@ -21,4 +21,4 @@ def test():
     unittest.TextTestRunner(verbosity=2).run(tests)
 
 if __name__ == '__main__':
-    janager.run()
+    manager.run()

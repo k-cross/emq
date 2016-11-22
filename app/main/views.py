@@ -161,7 +161,6 @@ def addUser():
 
         conn = mysql.connect()
         cursor = conn.cursor()
-        #data = cursor.fetchone()
         if not cursor is None:
             cursor.execute("SELECT * FROM user WHERE username ='"
                            + Username + "' OR email ='" + Email + "'")
@@ -195,7 +194,6 @@ def updateUser():
 
         conn = mysql.connect()
         cursor = conn.cursor()
-        #data = cursor.fetchone()
         if not cursor is None:
             cursor.execute("UPDATE user SET fname=%s,lname=%s,street=%s,zip=%s,city=%s,state=%s WHERE username ='" + session['username'] + "'",
                            (Fname, Lname, Street, Zip, City, State))
@@ -210,8 +208,6 @@ def updateUser():
 
 @main.route('/confirmation')
 def order_confirmation():
-    # Need to handle true validation / or we just assume it works and outside
-    # our scope
     return render_template('order_confirmation.html')
 
 
@@ -227,7 +223,6 @@ def checkout():
             cc = form.credit_card.data
             ct = form.card_type.data
 
-            # TODO: Replace with shopping cart function logic
             ShoppingCart(mysql, session).checkout()
 
             return redirect(url_for('.order_confirmation'))
@@ -248,9 +243,7 @@ def shopping_cart():
         session['usercart'] = usercart.cart
         cart = session['usercart']
 
-        #update quantity
         if request.method == 'POST':
-            #checkout 
             if form.validate_on_submit():
                 print("66")
                 if form.checkout_btn.data:
@@ -259,9 +252,9 @@ def shopping_cart():
             else:
                 quantity = request.form['quantity']
                 i = request.form['id']
-                print(i+" "+quantity)
-                usercart.update_cart(cart[int(i)-1][1], quantity)    
-                return redirect(url_for('.shopping_cart'))        
+                print(i + " " + quantity)
+                usercart.update_cart(cart[int(i) - 1][1], quantity)
+                return redirect(url_for('.shopping_cart'))
 
         return render_template('shopping_cart.html', form=form,
                                total=usercart.calculate_total(), cart=cart, count=0)
@@ -270,19 +263,19 @@ def shopping_cart():
         return redirect(url_for('.login'))
 
 
-# TODO: Implement a dynamic product page
 @main.route('/products', methods=['GET', 'POST'])
 def products():
     cursor = mysql.connect().cursor()
     if request.method == 'POST':
         searchTerm = request.form['search'].strip()
-        queryTerm = '\'%' + searchTerm + '%\''       
+        queryTerm = '\'%' + searchTerm + '%\''
         query = ("select I.*, SUM(I_D.stock) from inventory I, inventory_details I_D where I.pID = I_D.pID and pname like %s group by I.pID" % queryTerm)
         cursor.execute(query)
     else:
-        cursor.execute("select I.*, SUM(I_D.stock) from inventory I, inventory_details I_D where I.pID = I_D.pID group by I.pID") 
-    rows = cursor.fetchall()    
-    return render_template('products.html', products = rows)
+        cursor.execute(
+            "select I.*, SUM(I_D.stock) from inventory I, inventory_details I_D where I.pID = I_D.pID group by I.pID")
+    rows = cursor.fetchall()
+    return render_template('products.html', products=rows)
 
 
 @main.route('/about')
@@ -311,9 +304,10 @@ def singleproduct():
         cursor = mysql.connect().cursor()
         cursor.execute("select I.* from inventory I where I.pID =" + str(pID))
         row = cursor.fetchone()
-        print (cursor.rowcount)
+        print(cursor.rowcount)
         if(cursor.rowcount != 0):
-            cursor.execute("select I.*, SUM(I_D.stock) from inventory I, inventory_details I_D where I.pID = I_D.pID and I.pID =" + str(pID))
+            cursor.execute(
+                "select I.*, SUM(I_D.stock) from inventory I, inventory_details I_D where I.pID = I_D.pID and I.pID =" + str(pID))
             row = cursor.fetchone()
             return render_template('singleproduct.html', product=row)
         else:
@@ -324,12 +318,10 @@ def singleproduct():
 
 @main.route('/product/<int:id>', methods=['GET', 'POST'])
 def product(id):
-    
+
     if 'username' in session:
-       
-        #add from Single product page
         if request.method == 'POST':
-            
+
             product_Quantity = request.form['product-quantity-input']
             conn = mysql.connect()
             cursor = conn.cursor()
@@ -339,7 +331,7 @@ def product(id):
             row = cursor.fetchone()
 
             if row is None:
-                
+
                 cursor.execute("INSERT INTO cart (username, pID, quantity) VALUES (%s, %s, %s)",
                                (session['username'], id, product_Quantity))
                 conn.commit()
@@ -348,27 +340,28 @@ def product(id):
                 return redirect(url_for('.products'))
 
             else:
-                
-                cursor.execute("SELECT quantity FROM cart WHERE pID = %s", (id))
+
+                cursor.execute(
+                    "SELECT quantity FROM cart WHERE pID = %s", (id))
                 row = cursor.fetchone()
-                
+
                 quantity = row[0]
                 quantity = quantity + int(product_Quantity)
 
-                cursor.execute("UPDATE cart SET quantity=%s WHERE pID = %s", (quantity, id))
+                cursor.execute(
+                    "UPDATE cart SET quantity=%s WHERE pID = %s", (quantity, id))
                 conn.commit()
                 conn.close()
-                flash("Seleted item is increaed by "+ product_Quantity)
+                flash("Seleted item is increaed by " + product_Quantity)
                 return redirect(url_for('.products'))
         else:
-            
+
             print("testingtesting")
-            #add from products page
             conn = mysql.connect()
             cursor = conn.cursor()
 
             cursor.execute("SELECT * FROM cart WHERE pID = %s AND username = %s",
-                               (id, session['username']))
+                           (id, session['username']))
             row = cursor.fetchone()
 
             if row is None:
@@ -380,22 +373,24 @@ def product(id):
                 return redirect(url_for('.products'))
 
             else:
-                cursor.execute("SELECT quantity FROM cart WHERE pID = %s", (id))
+                cursor.execute(
+                    "SELECT quantity FROM cart WHERE pID = %s", (id))
                 row = cursor.fetchone()
-                
+
                 quantity = row[0]
                 quantity = quantity + 1
 
-                cursor.execute("UPDATE cart SET quantity=%s WHERE pID = %s", (quantity, id))
+                cursor.execute(
+                    "UPDATE cart SET quantity=%s WHERE pID = %s", (quantity, id))
                 conn.commit()
                 conn.close()
                 flash("Seleted item is increaed by 1")
                 return redirect(url_for('.products'))
-            
+
     else:
         flash("Please Login First")
         return redirect(url_for('.products'))
- 
+
 
 if __name__ == '__main__':
-    main.run(debug=False, host='0.0.0.0')
+    main.run(host='0.0.0.0')

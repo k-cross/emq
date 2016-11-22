@@ -1,11 +1,11 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'bs string'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
-    # TODO: A bunch of stuff
+    # TODO: A bunch of stuff 
+
 
     @staticmethod
     def init_app(app):
@@ -22,7 +22,7 @@ class TestingConfig(Config):
     FLASK_DB = ''
 
 config = {
-    'development': DevelopmentConfig,
-    'testing': TestingConfig,
-    'default': DevelopmentConfig
+        'development' : DevelopmentConfig,
+        'testing' : TestingConfig,
+        'default' : DevelopmentConfig
 }

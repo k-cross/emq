@@ -170,7 +170,6 @@ def addUser():
 
         conn = mysql.connect()
         cursor = conn.cursor()
-        #data = cursor.fetchone()
         if not cursor is None:
             cursor.execute("SELECT * FROM user WHERE username ='"
                            + Username + "' OR email ='" + Email + "'")
@@ -183,7 +182,7 @@ def addUser():
                                +
                                "street,zip,city,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                                (Username, hashed, Email, Fname, Lname, Street, Zip, City, State))
-                flash("Successfully registrated")
+                flash("Successfully Registered")
                 conn.commit()
         else:
             flash("Error during insert operation")
@@ -204,7 +203,6 @@ def updateUser():
 
         conn = mysql.connect()
         cursor = conn.cursor()
-        #data = cursor.fetchone()
         if not cursor is None:
             cursor.execute("UPDATE user SET fname=%s,lname=%s,street=%s,zip=%s,city=%s,state=%s WHERE username ='" + session['username'] + "'",
                            (Fname, Lname, Street, Zip, City, State))
@@ -219,8 +217,6 @@ def updateUser():
 
 @app.route('/confirmation')
 def order_confirmation():
-    # Need to handle true validation / or we just assume it works and outside
-    # our scope
     return render_template('order_confirmation.html')
 
 
@@ -236,7 +232,6 @@ def checkout():
             cc = form.credit_card.data
             ct = form.card_type.data
 
-            # TODO: Replace with shopping cart function logic
             ShoppingCart(mysql, session).checkout()
 
             return redirect(url_for('order_confirmation'))
