@@ -28,7 +28,7 @@ create table user(
 create table transaction(
 	transID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     userID int NOT NULL,
-    total_price decimal(9,2),
+    total_price FLOAT,
     trans_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deliveryDistanceEstimateTotalSeconds int,
     deliveryDistanceMeters int,
@@ -39,7 +39,7 @@ create table transaction(
 create table transaction_details(
 	transID int NOT NULL,
     pID int NOT NULL,
-    price decimal(9,2) NOT NULL,
+    price FLOAT NOT NULL,
     quantity int NOT NULL,
     storeID int NOT NULL,
     FOREIGN KEY (transID) REFERENCES transaction(transID) ON DELETE CASCADE,
@@ -50,7 +50,7 @@ create table inventory(
 	pID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     pname VARCHAR(256) NOT NULL,
     image VARCHAR(256) NOT NULL,
-    price decimal(6,2) NOT NULL,
+    price FLOAT NOT NULL,
     description VARCHAR(256) NOT NULL,
     category VARCHAR(256) NOT NULL,
     brand VARCHAR(256) NOT NULL

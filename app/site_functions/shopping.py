@@ -87,8 +87,8 @@ class ShoppingCart:
         for i in range(0, len(self.cart)):
             subtotal += float(self.cart[i][2]) * self.cart[i][3]
 
-        tax = subtotal * TAX_RATE
-        total = subtotal + tax + SHIPPING_RATE
+        tax = round(subtotal * TAX_RATE, 2)
+        total = round(subtotal + tax + SHIPPING_RATE, 2)
 
         if subtotal > 0.0:
             return total, subtotal, tax, SHIPPING_RATE

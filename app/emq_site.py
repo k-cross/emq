@@ -131,7 +131,7 @@ def checkUser():
     if not cursor is None:
 
         cursor.execute(
-            "Select password,userID from user where username='" + Username + "'")
+            "Select password,userID from user where username='{}'".format(Username))
 
         row = cursor.fetchone()
         if not row is None:
