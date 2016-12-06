@@ -241,7 +241,7 @@ def checkout():
 
             # TODO: Replace with shopping cart function logic
             if not ShoppingCart(mysql, session).checkout():
-                flash("The address must within the bay area")
+                flash("Address Out of Range: Must be in the Bay Area!")
                 return redirect(url_for('shopping_cart'))
 
             return redirect(url_for('order_confirmation'))
@@ -401,7 +401,7 @@ def product(id):
                 cursor.execute("UPDATE cart SET quantity=%s WHERE pID = %s", (quantity, id))
                 conn.commit()
                 conn.close()
-                flash("Seleted item is increaed by 1")
+                flash("Selected item increased by 1")
                 return redirect(url_for('products'))
             
     else:
