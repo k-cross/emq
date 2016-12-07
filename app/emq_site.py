@@ -12,6 +12,7 @@ from datetime import datetime
 # Our written additions
 from settings import app_setup
 from site_functions.shopping import ShoppingCart, CheckoutForm
+from site_functions.create_account import AccountForm
 from site_functions import order
 
 
@@ -29,6 +30,48 @@ def home():
         return render_template('home.html')
     except Exception as e:
         print(e)
+
+@app.route('/createAccount', methods=['GET', 'POST'])
+def createAccount():
+    account_form = AccountForm()
+
+    if request.method == 'POST':
+        Username = account_form.username.data
+        Password = account_form.password.data
+        Fname =    account_form.firstname.data
+        Lname =    account_form.lastname.data
+        Email =    account_form.email.data
+        Street =   account_form.address.data
+        City =     account_form.city.data
+        State =    account_form.state.data
+        Zip =      int(account_form.zipcode.data)
+
+        hashed = generate_password_hash(Password)
+
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        
+        if not cursor is None:
+            cursor.execute("SELECT * FROM user WHERE username ='"
+                           + Username + "' OR email ='" + Email + "'")
+            row = cursor.fetchone()
+            if row is not None:
+                flash("That Username or Email is already taken")
+                return render_template('acct_create.html')
+            else:
+                cursor.execute("INSERT INTO user (username,password,email,fname,lname,"
+                               +
+                               "street,zip,city,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                               (Username, hashed, Email, Fname, Lname, Street, Zip, City, State))
+                flash("Successfully Registered")
+                conn.commit()
+        else:
+            flash("Error during insert operation")
+
+        conn.close()
+        return render_template("login.html")
+    return render_template('acct_create.html', newprofile1=account_form)
+
 
 
 @app.route('/contact', methods=['GET', 'POST'])
@@ -56,14 +99,6 @@ def contact():
 
     elif request.method == 'GET':
         return render_template('contact.html', forms=forms)
-
-
-@app.route('/createAccount')
-def createAccount():
-    try:
-        return render_template('createAccount.html')
-    except Exception as e:
-        print(e)
 
 
 @app.route('/login')
@@ -98,11 +133,11 @@ def profile():
             if not cursor is None:
 
                 cursor.execute(
-                    "Select email,fname,lname,street,zip,city,state from user where username='" + session['username'] + "'")
+                    "SELECT email,fname,lname,street,zip,city,state FROM user WHERE username='" + session['username'] + "'")
                 row = cursor.fetchone()
 
                 cursor.execute(
-                    "Select total_price, trans_time, status, transID from transaction where userid=%s", (session['userid']))
+                    "SELECT total_price, trans_time, status, transID FROM transaction WHERE userid=%s", (session['userid']))
 
                 orderRows = cursor.fetchall()
 
@@ -153,45 +188,6 @@ def checkUser():
     return redirect(url_for('home'))
 
 
-@app.route('/addUser', methods=['POST', 'GET'])
-def addUser():
-    if request.method == 'POST':
-        Username = request.form['username']
-        Password = request.form['userpassword']
-        Fname = request.form['userfname']
-        Lname = request.form['userlname']
-        Email = request.form['userEmail']
-        Street = request.form['street']
-        Zip = int(request.form['zip'])
-        City = request.form['city']
-        State = request.form['state']
-
-        hashed = generate_password_hash(Password)
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        
-        if not cursor is None:
-            cursor.execute("SELECT * FROM user WHERE username ='"
-                           + Username + "' OR email ='" + Email + "'")
-            row = cursor.fetchone()
-            if row is not None:
-                flash("That Username or Email is already taken")
-                return render_template('createAccount.html')
-            else:
-                cursor.execute("INSERT INTO user (username,password,email,fname,lname,"
-                               +
-                               "street,zip,city,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                               (Username, hashed, Email, Fname, Lname, Street, Zip, City, State))
-                flash("Successfully Registered")
-                conn.commit()
-        else:
-            flash("Error during insert operation")
-
-        conn.close()
-        return render_template("createAccount.html")
-
-
 @app.route('/updateUser', methods=['POST', 'GET'])
 def updateUser():
     if request.method == 'POST':
@@ -239,7 +235,6 @@ def checkout():
             cc = form.credit_card.data
             ct = form.card_type.data
 
-            # TODO: Replace with shopping cart function logic
             if not ShoppingCart(mysql, session).checkout():
                 flash("Address Out of Range: Must be in the Bay Area!")
                 return redirect(url_for('shopping_cart'))
@@ -284,7 +279,6 @@ def shopping_cart():
         return redirect(url_for('login'))
 
 
-# TODO: Implement a dynamic product page
 @app.route('/products', methods=['GET', 'POST'])
 def products():
     cursor = mysql.connect().cursor()

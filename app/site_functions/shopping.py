@@ -30,7 +30,6 @@ class ShoppingCartForm(FlaskForm):
 
 
 class ShoppingCart:
-
     def __init__(self, mysql, session):
         self.queries = {
             'grab_items': "SELECT pname, cart.pid, price, quantity FROM cart, "
