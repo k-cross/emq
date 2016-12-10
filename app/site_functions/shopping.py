@@ -61,7 +61,8 @@ class ShoppingCart:
                         + "WHERE t.transID = {} and t.transID = td.transID and t.userId = user.userID "
                         + "GROUP BY user.userID, t.transID;",
             'grab_address': "SELECT CONCAT(user.street, ', ', user.city, ', ', user.state, ' ', user.zip) FROM USER WHERE userID = {};",
-            'update_status': "UPDATE transaction SET status = {} where transID = {}"
+            'update_status': "UPDATE transaction SET status = {} where transID = {}",
+            'delete_item': "DELETE FROM cart WHERE pid={}"
         }
 
         self.mysql = mysql
@@ -125,6 +126,19 @@ class ShoppingCart:
             qty,
             pid,
             self.session['username']
+        ))
+        connection.commit()
+        connection.close()
+
+        self.get_items()
+        self.session['usercart'] = self.cart
+
+    def delete_cart(self, pid):
+        connection = self.mysql.connect()
+        cursor = connection.cursor()
+
+        cursor.execute(self.queries['delete_item'].format(
+            pid,
         ))
         connection.commit()
         connection.close()

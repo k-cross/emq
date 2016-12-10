@@ -14,7 +14,8 @@ from settings import app_setup
 from site_functions.shopping import ShoppingCart, CheckoutForm
 from site_functions.create_account import AccountForm
 from site_functions import order
-
+import urllib
+import simplejson
 
 # Initialize Application
 app = app_setup()
@@ -59,6 +60,7 @@ def createAccount():
                 flash("That Username or Email is already taken")
                 return render_template('acct_create.html')
             else:
+                
                 cursor.execute("INSERT INTO user (username,password,email,fname,lname,"
                                +
                                "street,zip,city,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
@@ -81,7 +83,7 @@ def contact():
             'First Name', [validators.Required("Enter your first name")])
         lname = TextField(
             'Last Name', [validators.Required("Enter your last name")])
-        email = StringField(validators=[Required, Email])
+        email = StringField('Email address', [validators.DataRequired(), validators.Email(), validators.Length(min=15, max=34)])
         phone = IntegerField(
             'Phone Number', validators = [NumberRange(1000000000, 9999999999)])
         message = TextAreaField(
@@ -154,6 +156,30 @@ def profile():
     except Exception as e:
         print(e)
 
+def isValidAddress(address, from_sensor=False):
+    googleGeocodeUrl = 'http://maps.googleapis.com/maps/api/geocode/json?'
+    address = address.encode('utf-8')
+    params = {
+        'address': address,
+        'sensor': "true" if from_sensor else "false"
+    }
+    url = googleGeocodeUrl + urllib.parse.urlencode(params)
+    json_response = urllib.request.urlopen(url)
+    response = simplejson.loads(json_response.read())
+    
+    if response['results']:
+        
+        location = response['results'][0]['geometry']['location']
+        latitude, longitude = location['lat'], location['lng']
+        print (address, latitude, longitude)
+        return True
+    else:
+        
+        latitude, longitude = None, None
+        #print address, "<no results>"
+        return False
+    #return latitude, longitude
+    return False
 
 @app.route('/checkUser', methods=['POST', 'GET'])
 def checkUser():
@@ -202,10 +228,20 @@ def updateUser():
         cursor = conn.cursor()
         
         if not cursor is None:
-            cursor.execute("UPDATE user SET fname=%s,lname=%s,street=%s,zip=%s,city=%s,state=%s WHERE username ='" + session['username'] + "'",
-                           (Fname, Lname, Street, Zip, City, State))
-            flash("Information Updated")
-            conn.commit()
+            cursor.execute(
+                "SELECT CONCAT(user.street, ', ', user.city, ', ', user.state, ' ', user.zip) FROM user WHERE userID='"+str(session['userid'])+"'")
+            deliverAddress = cursor.fetchone()[0]
+            
+            if isValidAddress(deliverAddress):
+                cursor.execute("UPDATE user SET fname=%s,lname=%s,street=%s,zip=%s,city=%s,state=%s WHERE username ='" + session['username'] + "'",
+                               (Fname, Lname, Street, Zip, City, State))
+                flash("Information Updated")
+                conn.commit()
+            else:
+                print(2)
+                flash("Invalide Address.")
+                return redirect(url_for('profile'))
+                
         else:
             flash("error in Update operation")
 
@@ -261,7 +297,7 @@ def shopping_cart():
         if request.method == 'POST':
             #checkout 
             if form.validate_on_submit():
-                print("66")
+                
                 if form.checkout_btn.data:
                     session['total'] = usercart.calculate_total()[0]
                     return redirect(url_for('checkout'))
@@ -270,6 +306,29 @@ def shopping_cart():
                 i = request.form['id']
                 print(i+" "+quantity)
                 usercart.update_cart(cart[int(i)-1][1], quantity)    
+                return redirect(url_for('shopping_cart'))        
+
+        return render_template('shopping_cart.html', form=form,
+                               total=usercart.calculate_total(), cart=cart, count=0)
+    else:
+        flash('Please Login')
+        return redirect(url_for('login'))
+
+@app.route('/delet_cart', methods=['GET', 'POST'])
+def Delet_Item():
+
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    if 'username' in session:
+        usercart = ShoppingCart(mysql, session)
+        form = usercart.form
+        session['usercart'] = usercart.cart
+        cart = session['usercart']
+
+        if request.method == 'POST':
+                i = request.form['id']
+                usercart.delete_cart(cart[int(i)-1][1])    
                 return redirect(url_for('shopping_cart'))        
 
         return render_template('shopping_cart.html', form=form,
