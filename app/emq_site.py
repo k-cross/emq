@@ -81,7 +81,7 @@ def contact():
             'First Name', [validators.Required("Enter your first name")])
         lname = TextField(
             'Last Name', [validators.Required("Enter your last name")])
-        email = StringField(validators=[Required, Email])
+        email = StringField('Email address', [validators.DataRequired(), validators.Email()])
         phone = IntegerField(
             'Phone Number', validators = [NumberRange(1000000000, 9999999999)])
         message = TextAreaField(
