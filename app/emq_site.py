@@ -374,7 +374,9 @@ def trackDelivery():
 @app.route('/sproduct', methods=['GET', 'POST'])
 def singleproduct():
     try:
-        pID = request.args.get('id')
+        pID = request.args.get('id').strip()
+        if not pID.isdigit():
+            return render_template('product_not_exist.html')
         cursor = mysql.connect().cursor()
         cursor.execute("select I.* from inventory I where I.pID =" + str(pID))
         row = cursor.fetchone()
