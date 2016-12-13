@@ -28,6 +28,7 @@ insert into store (street, city, state, zip) values ('1150 El Camino Real', 'San
 insert into store (street, city, state, zip) values ('1830 Ocean Ave', 'San Francisco', 'CA', 94112);
 insert into store (street, city, state, zip) values ('2675 Geary Blvd', 'San Francisco', 'CA', 94118);
 insert into store (street, city, state, zip) values ('2700 5th St', 'Alameda', 'CA', 94501);
+insert into store (street, city, state, zip) values ('2398 Norse Dr', 'Pleasant Hill', 'CA', 94523);
 
 /*
 insert into inventory (pname, image, description, category, brand, price) values ('Samsung television', '/product_images/samtelevision.jpg', 'It\'s a Samsung tv', 'television', 'Samsung', 5000.00);
