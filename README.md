@@ -1,5 +1,10 @@
 # EMQ Project Website
 * The basic website for the EMQ Project
+## Docker
+* In order to run with docker
+   * "docker run -it -p 5000:5000 quasarken/emq:latest bash"
+   * In the container type "/etc/init.d/mysql start && cd / && python emq_app.py"
+   * Open browser and go to http://localhost:5000
 ## Dependencies
 * pip install
     * flask-bootstrap
